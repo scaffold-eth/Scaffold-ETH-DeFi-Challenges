@@ -1,0 +1,3 @@
+@yearnvaults/=lib/yearn-vaults/
+@openzeppelin/=lib/openzeppelin-contracts/
+forge-std/=lib/forge-std/src/
