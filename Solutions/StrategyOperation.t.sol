@@ -96,10 +96,10 @@ contract StrategyOperationsTest is StrategyFixture {
         assertRelApproxEq(strategy.estimatedTotalAssets(), _amount, DELTA);
 
         // SCAFFOLD-ETH-DeFi-Challenge-#1: Uncomment below to simulate accumulation of DAI within the cDAI address ultimately resulting in yield gathered in the strategy.
-        // address cDAI = 0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643;
-        // uint256 daiBalOfPool = want.balanceOf(cDAI);
-        // uint256 amountToAirdrop = daiBalOfPool / 1000;
-        // deal(address(want), cDAI, daiBalOfPool + amountToAirdrop);
+        address cDAI = 0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643;
+        uint256 daiBalOfPool = want.balanceOf(cDAI);
+        uint256 amountToAirdrop = daiBalOfPool / 1000;
+        deal(address(want), cDAI, daiBalOfPool + amountToAirdrop);
 
         // Harvest 2: Realize profit
         skip(1);

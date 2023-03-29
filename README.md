@@ -399,7 +399,7 @@ First there's one in `StrategyShutdown.t.sol`:
 
 💡 What you're doing here is replacing the previous line of code with a foundry cheat code that allows some leweigh in the minute losses seen when carrying out this test. It's not perfect, but sometimes losses occurring through several tx executions is bound to happen.
 
-Basically, the two functions: `liquidateAllPositions()` and `prepareMigration()` need to be written.
+Moving on from the test code, we still have problems arising because we have two more functions to write implementation code for;  `liquidateAllPositions()` and `prepareMigration()`.
 
 ---
 #### 1️⃣ **Error #1: `liquidateAllPositions()`**
@@ -427,7 +427,9 @@ function liquidateAllPositions() internal override returns (uint256) {
 
 </details>
 
-Now run `make test` and you should see that only one error remains.
+Now run `make test` and you should see that only two error remains. `testProfitableHarvest()` and  `testMigration(uint256)` are still failing. We'll focus on the latter first.
+
+> BTW `liquidateAllPositions()` was causing errors in the `testRevokeStrategyFromStrategy()` and `testBasicShutdown()` because v2 vaults have a function, `_revokeStrategy()` that ultimately sets the DR to be 0 for a strategy and ultimately calls `liquidateAllPositions()`. Thus `liquidateAllPositions()` implementation is fully needed for these two tests. 😎
 
 ---
 
@@ -451,7 +453,7 @@ Now try writing the implementation. Your task is to write the function so it:
 
 </details>
 
-> 🎉🎉 Awesome!!! Now if you run `make test` again you should only see one new failing test. Let's take a look at that one now. It is in the `StrategyOperation.t.sol` file though, and not in your `Strategy.sol` code itself.
+> 🎉🎉 Awesome!!! Now if you run `make test` again you should only see one failing test, `testProfitableHarvest()`. Let's take a look at that one now. It is in the `StrategyOperation.t.sol` file though, and not in your `Strategy.sol` code itself.
 
 Here's a great opportunity to get familiar a bit with how one writes tests with foundry. Foundry enables many functionalities, but a key one is that it keeps development all within Solidity (smart contracts and test writing). There are clear advantages to this when thinking about the nuances that arise when working with EthersJS alternatively. As well the speed of foundry testing is very fast for running things like fuzzing tests.
 
