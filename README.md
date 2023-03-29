@@ -53,8 +53,6 @@ TODO: add instructions from the foundry branch to combine scaffold eth v2 and fo
 
 3. Build the project and make sure everything compiles: `forge build`
 
-- TODO: test all steps.
-
 ---
 
 ### 🐇 **2.1 Yearn Context**
@@ -138,6 +136,13 @@ User withdraws from the vault which calls withdraw from the strategy. This furth
 
 Hopefully the architecture makes more sense to you. Now that you understand that, we'll jump into the coding part of the challenge.
 
+### 🥅 **Goals / Checks**
+
+- [ ] 🐇 Can you explain what yearn strategies do, how their overall flow works with respect to yearn v2 vaults?
+- [ ] ❗ What does DR stand for and why is it important to strategies and vaults?
+
+If you have trouble answering these questions, reread this README and also make sure to check out the full video by @charlesndalton found [here](https://www.youtube.com/watch?v=z48R7dhAGP4&ab_channel=ETHGlobal).
+
 ---
 
 ## 🏊🏻‍♀️🌊 **3.0 Diving into the Code**
@@ -176,6 +181,10 @@ ICToken internal constant cDAI = ICToken(0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3
 </details>
 
 ---
+
+### 🥅 **Goals / Checks**
+
+- [ ] ❓ Can you explain the core functions shown in the ICToken.sol interface?
 
 ### ⛳️ **Checkpoint 3: Approvals, StrategyName && estimatedTotalAssets()** ⚖️
 
@@ -222,6 +231,10 @@ function estimatedTotalAssets() public view override returns (uint256) {
 ```
 
 </details>
+
+### 🥅 **Goals / Checks**
+
+- [ ] 📞 Your implementation should be making two function calls to the `ICToken.sol` interface and instantiated `CToken.sol` in `Strategy.sol`. Is your contract doing this?
 
 ---
 
@@ -352,6 +365,10 @@ function liquidatePosition(uint256 _amountNeeded) internal override returns (uin
 }
 ```
 </details>
+
+### 🥅 TODO **Goals / Checks**
+
+- [ ] 👀👀 Time to check your general knowledge. You've written the basic core functions of a simple yearn strategy. Can you outline what scenarios exist when KEEP3R bots call `harvest()` from the DAI Yearn vault? What happens if they call `harvest()` with no `debtAmount` defined to be pulled out? What if they call `harvest()` with an amount defined to pull out that is less than the amount within the strategy? What if they call `harvest()` with a defined pull out amount that is greater than the amount in the strategy? What happens when a strategist calls `vault.withdraw(amount)`? How does your strategy ensure enough tokens are extracted when the vault calls the strategy for this?
 
 ---
 
@@ -514,7 +531,9 @@ Now with all that done, run `make test` one more time.
 
 **🎉🍾 Congratulations!!! You just finished writing your first simple yearn strategy!!!**
 
-🚨 As mentioned, this is just a tutorial so don't go deploying this on mainnet yourself with the expectation that it is safe. This tutorial is meant to teach the basics, and there already is a compound strategy that Yearn uses for DAI!
+🚨 As mentioned, this is just a tutorial so don't go deploying this on mainnet yourself with the expectation that it is safe. This tutorial is meant to teach the basics, and there already is a compound strategy that Yearn uses for DAI! Soon, this challenge will be autograded to show that you've gone through it on SRE. Until then, we implore you to continue to explore yearn strategies (more tutorials to come) and even start chatting in the Yearn discord and Telegram groups.
+
+If you're really up for it, they're always looking for good strategists. Don't be a stranger anon!
 
 ---
 
