@@ -1,19 +1,16 @@
 # 🏗 scaffold-eth | 🏰 BuidlGuidl
 
-## 🚩 **🐇 1.0 Challenge 1: Simple Yearn Strategy**
+## 🚩 **🐇 1.0 Challenge 2: Sommelier ERC4626 Adaptor**
 
 This challenge is focused on guiding students through the following:
 
-- 💡 What a Yearn Strategy is
-- 👀 The typical ins and outs of a Yearn strategy to be aware of that Yearn v2 Vaults take with their actual strategies
-- 💪🏼 Writing this yearn strategy and getting experience dealing with some types of the basics.
+- 💡 What ERC4626 Vaults are
+- 👀 The typical ins and outs of a Sommelier strategy to be aware of that Sommelier v2.5 Vaults (Cellars) take with their actual strategies
+- 💪🏼 Writing this Sommelier Adaptor to integrate with Aura Protocol and getting experience dealing with some types of the basics.
 
-**This is the first part of 2 challenges focused on writing Yearn strategies.**
+> TODO: 💬 Meet other builders in the [DeFi Challenge 2 Telegram!](insert LINK HERE)
 
-1. 🙇🏻‍♂️ First challenge - create a super simple strategy to get used to the ins and outs of the `harvest` tx flow.
-2. 🦍 Second challenge - create a strategy atop of Mellow Protocol && Gearbox Protocol w/ tests!
-
-> TODO: 💬 Meet other builders in the [Challenge 1 Telegram!](insert LINK HERE)
+💡✨ This serves as the first of possibly many ERC4626 Adaptor Challenges / Tutorials focused on the creation and usage of "APIs" for different external projects. If you are interested in writing new Challenges / Tutorials, please reach out to @steve0xp && @austingriffith.
 
 ---
 
@@ -55,19 +52,22 @@ TODO: add instructions from the foundry branch to combine scaffold eth v2 and fo
 
 ---
 
-### 🐇 **2.1 Yearn Context**
+### 🐇 **2.1 Sommelier Context**
 
-🎥👨🏻‍🏫 To kick things off, we'll start by going over the yearn strategy tutorial (using foundry testing framework) that Yearn core dev, @charlesndalton, has gone over in this [video](https://www.youtube.com/watch?v=z48R7dhAGP4&ab_channel=ETHGlobal).
+🎥👨🏻‍🏫 The Sommelier protocol (Sommelier) is a Yield Aggregator project that has "Strategists" manage on-chain ERC4626 Vaults via the $SOMM chain infrastructure ($SOMM Validator sets, encoded-message transferrance via the Gravity Bridge, and $SOMM Governance). The project touts over 2X growth in TVL over the last 5-6 months and currently operates on Ethereum mainnet.
 
-This README will serve as a written tutorial / challenge on how to write the `Strategy.sol` described in this video.
+Future video walkthroughs will be released (currently under development). This tutorial / challenge serves as a written version of future walkthroughs to be completed.
 
-> _If you are more of a visual learner, check out the video. That said, please do make sure to understand the function details if you are watching the video and seeing him type out the solutions._
+Since Sommelier uses ERC4626 Vaults, it requires new smart contracts to be made to integrate external protocols to its ERC4626 Vaults. These smart contracts are referred to as `Adaptors`. 
 
-If you have questions that are outside of the scope of this challenge's TG group chat then we recommend trying to ask a question in the Yearn Discord or the [Yearn General Telegram Group Chat](https://t.me/yearnfinance). If you can get into the gated YFI Boarding School, you'll have access to lots of great people with a lot of experience too.
+This tutorial is broken into two main parts:
 
-🤓🤓 @charlesndalton covers making a yearn strategy where we pull DAI from the DAIVault in Yearn and deploy it in a lending pool in Compound. If you're not familiar with Compound, they are an OG lending protocol where users can be lenders and borrowers of whitelisted tokens (deemed legitimate through Compound governance).
+1. ERC4626Agnostic Adaptors: Construction of an ERC4626 Agnostic Adaptor so any ERC4626 Vault can use the core functionalities of it.
+2. Sommelier-Specifics: Addition of Sommelier Specific aspects to make the Adaptor integratable with the Sommelier Tech Stack.
 
-This README and the `Solutions.sol` file are the additional solutions files for this strategy that will help educate people in tandem with the video mentioned.
+---
+
+If you have questions that are outside of the scope of this challenge's TG group chat then we recommend trying to ask a question in the [Sommelier Discord](https://discord.com/invite/ZcAYgSBxvY). As well, feel free to make PRs to the [Sommelier Smart Contracts Github](https://github.com/PeggyJV/cellar-contracts).
 
 Let's get into it! 👨🏻‍💻🧑🏻‍💻👩🏻‍💻
 
@@ -75,77 +75,44 @@ Let's get into it! 👨🏻‍💻🧑🏻‍💻👩🏻‍💻
 
 ### **🏰🔍 2.2 General Architecture**
 
-For each yVault there are multiple strategies. Example in the above image: DAI is distributed to different strategies where certain amounts have allocations to it.
+As mentioned, each Sommelier Vault is an ERC4626 Vault. If you need more context on ERC4626, we recommend checking out these links:
 
-![image](./images/HowYearnWorks.png)
+1. [EIP 4626](TODO: LINK)
+2. [ERC 4626 Interface & Implementation](TODO: LINK)
+3. [ERC 4626 Alliance](TODO: LINK)
+4. [Sommelier ERC4626 Implementation](TODO: LINK)
 
-💡 Recall: yVaults are secure entities that have ownership of the digital assets in question. Within Yearn, users interact with vaults mainly in their UI, and deposit or withdraw tokens into respective vaults that are isolated to specific a specific token.
+In case you have not gone through the [Challenge #1: Simple Yearn Strategy](LINK), here's some quick context on how vaults work in DeFi.
 
-That token is then added to the vault's pile of assets from all involved depositors and yearn will distribute the amount of assets to different yield-bearing strategies to earn the depositors APY.
+For each Vault there are typically multiple strategies. These can take various formats, but ultimately it incorporates a Vault contract with multiple `positions` where the Vault's `baseAssets`, often pooled from a collection of users, are used to attain specific compositions of assets. These could be as simple as swapping the base asset for a collection of different assets, or using said base asset in LPing positions to generate trading fees. Example in the below image: a `baseAsset` is distributed to different strategies where certain amounts have allocations to it. The first part of the tutorial will go through creating adaptors that work for any vault, such that numerous positions could be had with different adaptors for each vault as seen in the below schematic.
 
----
+![image](./images/HowYearnWorks.png) TODO: schematic image showcasing Sommelier architecture for vaults specifically.
 
-### **💵🪙 2.3 Accounting VIP Details**
+💡 Recall: Here, Sommelier Vaults are secure entities that have ownership of the digital assets in question. Within Sommelier, users interact with vaults mainly in their UI, and deposit or withdraw tokens into respective vaults that are isolated to specific a specific token.
 
-It's key to know that the strategies take on `debt` from the vaults. AKA some amount of DAI is given to the strategy from the vault. So the strategies below would have some `debt` w/ specified amounts.
+That token is then added to the vault's pile of assets from all involved depositors and Sommelier will distribute the amount of assets to different yield-bearing strategies to earn the Vault, and thus depositors, APY.
 
-Let's first touch on the `harvest` sequences for a typical strategy and then dive a bit deeper into them before coding:
+Part 2, we'll go through the Sommelier architecture showcased below.
 
-#### **🧑🏽‍🌾🚜`harvest()` sequence**
+![image](./images/HowYearnWorks.png) TODO: schematic image showcasing Sommelier architecture for everything.
 
-Typically, yearn strategies have three asset flow scenarios:
-
-1. **➕ Increase Debt Ratio (DR):**
-
-   a. `vault` function `deposit()` is used to deposit funds to strategy. Newly deposited funds are not deployed into the Strategy implementation yet, this happens next time bot(typically a keep3r) calls `harvest()` which also acts as an accounting event.
-
-   b. `harvest()` calls `prepareReturn()` and then calls `adjustPosition()` which then deposits `wantToken` into strategy assuming `_debtOutstanding = 0`.
-
-2. **➖ Decrease DR:**
-
-   a. `vault` function `withdraw()` is used to withdraw a specified `_debtOutstanding` from strategy.
-
-   b. Strategy calls `prepareReturn(_debtOutstanding)` which then does the accounting to see if a profit was made or not in this harvest.
-
-   c. From there it uses `liquidate(_debtOutstanding)` to exit the strategy with required amount of `wantToken`
-
-3. **Keep DR and tend() yields: this is not used as much.**
-
----
-
-### **🌊🔍 2.4 Strategy Flow #1 Detailed (follows video)**
-
-_Don't worry about the bots, we use OP, a template pattern that extends from the template_
-
-`harvest()` is called by a `keep3r` which does the following:
-
-- `prepareReturn(debtOutstanding)` : decelaring accounting losses and gains since the last harvest. `debtOutstanding` is the amount of wantToken that the vault wants back. So within `prepareReturn()` there will be internal calls to liquidate, if needed, some wantToken to obtain the requested amount of `debt` back to the vault from the respective strategy. This is a function that exists in every strategy.
-- `adjustPosition(debtOutstanding)` : the inverse of the above, investing any excess `wantToken` into the respective strategy. In this case DAI.
-
-![image](./images/StrategyFlow1.png)
-
----
-
-### **🌊🔍 2.5 Strategy Flow #2 Detailed (follows video)**
-
-User withdraws from the vault which calls withdraw from the strategy. This further calls a function called `liquidatePosition(amountNeeded)`. If not enough funds then losses are declared (accounting side of things).
-
-`withdraw()`
-
-![image](./images/StrategyFlow2.png)
-
-Hopefully the architecture makes more sense to you. Now that you understand that, we'll jump into the coding part of the challenge.
+Before getting caught up too much in the architecture, we should jump into the actual challenge. As you go through the challenge, you can better understand this architecture more, and we'll have key 'gotchas' throughout. 😁
 
 ### 🥅 **Goals / Checks**
 
-- [ ] 🐇 Can you explain what yearn strategies do, how their overall flow works with respect to yearn v2 vaults?
-- [ ] ❗ What does DR stand for and why is it important to strategies and vaults?
+- [ ] 🐇 Can you explain what ERC4626 Vaults are?
 
-If you have trouble answering these questions, reread this README and also make sure to check out the full video by @charlesndalton found [here](https://www.youtube.com/watch?v=z48R7dhAGP4&ab_channel=ETHGlobal).
+If you have trouble answering these questions, reread this README and also make sure to check out the links mentioned in this section.
 
 ---
 
 ## 🏊🏻‍♀️🌊 **3.0 Diving into the Code**
+
+Now that you understand ERC4626 Vaults more, you should be able to see how Adaptors act as "APIs" for ERC4626 Vaults to interact with different external protocols. 
+
+We will work with the starting `IERC4626Adaptor.sol` contract that Sommelier provides [here](). 
+
+TODO: STEVE THIS IS WHERE YOU LEFT OFF.
 
 Yearn vaults are written in vyper, and strategies are written in solidity. There is a brownie-mix and a foundry-mix for writing strategies. The foundry-mix suggested to be used as a template repo for new strategies is the foundry mix that @storming0x made [here](LINK).
 
@@ -706,3 +673,62 @@ Note though that to make this work, you must set your `INFURA_API_KEY` and your 
 - [Learn Foundry Tutorial](https://www.youtube.com/watch?v=Rp_V7bYiTCM)
 
 </details>
+
+
+
+----
+
+# Archive (stuff from Yearn strategy that I may try to incorporate)
+
+# High lvl architecture stuff that got axed
+
+### **💵🪙 2.3 Accounting VIP Details**
+
+It's key to know that the strategies take on `debt` from the vaults. AKA some amount of DAI is given to the strategy from the vault. So the strategies below would have some `debt` w/ specified amounts.
+
+Let's first touch on the `harvest` sequences for a typical strategy and then dive a bit deeper into them before coding:
+
+#### **🧑🏽‍🌾🚜`harvest()` sequence**
+
+Typically, yearn strategies have three asset flow scenarios:
+
+1. **➕ Increase Debt Ratio (DR):**
+
+   a. `vault` function `deposit()` is used to deposit funds to strategy. Newly deposited funds are not deployed into the Strategy implementation yet, this happens next time bot(typically a keep3r) calls `harvest()` which also acts as an accounting event.
+
+   b. `harvest()` calls `prepareReturn()` and then calls `adjustPosition()` which then deposits `wantToken` into strategy assuming `_debtOutstanding = 0`.
+
+2. **➖ Decrease DR:**
+
+   a. `vault` function `withdraw()` is used to withdraw a specified `_debtOutstanding` from strategy.
+
+   b. Strategy calls `prepareReturn(_debtOutstanding)` which then does the accounting to see if a profit was made or not in this harvest.
+
+   c. From there it uses `liquidate(_debtOutstanding)` to exit the strategy with required amount of `wantToken`
+
+3. **Keep DR and tend() yields: this is not used as much.**
+
+---
+
+### **🌊🔍 2.4 Strategy Flow #1 Detailed (follows video)**
+
+_Don't worry about the bots, we use OP, a template pattern that extends from the template_
+
+`harvest()` is called by a `keep3r` which does the following:
+
+- `prepareReturn(debtOutstanding)` : decelaring accounting losses and gains since the last harvest. `debtOutstanding` is the amount of wantToken that the vault wants back. So within `prepareReturn()` there will be internal calls to liquidate, if needed, some wantToken to obtain the requested amount of `debt` back to the vault from the respective strategy. This is a function that exists in every strategy.
+- `adjustPosition(debtOutstanding)` : the inverse of the above, investing any excess `wantToken` into the respective strategy. In this case DAI.
+
+![image](./images/StrategyFlow1.png)
+
+---
+
+### **🌊🔍 2.5 Strategy Flow #2 Detailed (follows video)**
+
+User withdraws from the vault which calls withdraw from the strategy. This further calls a function called `liquidatePosition(amountNeeded)`. If not enough funds then losses are declared (accounting side of things).
+
+`withdraw()`
+
+![image](./images/StrategyFlow2.png)
+
+Hopefully the architecture makes more sense to you. Now that you understand that, we'll jump into the coding part of the challenge.
