@@ -9,3 +9,6 @@
 	path = lib/yearn-vaults
 	url = https://github.com/yearn/yearn-vaults
 	branch = v0.4.5
+[submodule "lib/cellar-contracts"]
+	path = lib/cellar-contracts
+	url = https://github.com/PeggyJV/cellar-contracts
