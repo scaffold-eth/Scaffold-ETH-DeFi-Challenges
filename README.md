@@ -1,17 +1,19 @@
 # 🏗 scaffold-eth | 🏰 BuidlGuidl
 
+> This is still a WIP and not a fully-ready challenge. Please contact @steve0xp if you are interested in contributing to finishing this challenge or want to learn more. 
+
 # 🚩 🍷 DeFi Challenge 2: Sommelier ERC4626 Adaptor**
 
 This challenge is focused on guiding students through the following:
 
 - 💡 What ERC4626 Vaults are
-- 👀 The typical ins and outs of a Sommelier strategy to be aware of that Sommelier v2.5 Vaults (Cellars) take with their actual strategies
+- 👀 The typical ins and outs of a Sommelier strategy to be aware of that Sommelier v2.5 Vaults (Cellars) take with their actual strategies. This challenge was based off of smart contract work carried out within this [repo](https://github.com/PeggyJV/cellar-contracts). The challenge is based off of recent smart contract work that HAS NOT BEEN AUDITED after coordinating with the smart contract dev teams there. THIS CHALLENGE AND THE CODE INVOLVED IS NOT TO BE USED FOR PRODUCTION CODE, AND AGAIN HAS NOT BEEN AUDITED. IT IS FOR EDUCATIONAL PURPOSES ONLY.
 - 💪🏼 Writing this Sommelier Adaptor to integrate with Aura Protocol and getting experience dealing with some types of the basics.
 
 > TODO: 💬 Meet other builders in the [DeFi Challenge 2 Telegram!](insert LINK HERE)
 
 💡✨ This serves as the first of possibly many ERC4626 Adaptor Challenges / Tutorials focused on the creation and usage of "APIs" for different external projects. If you are interested in writing new Challenges / Tutorials, please reach out to @steve0xp && @austingriffith.
-
+d
 ---
 
 ## **🚨 1.1 DeFi Sub-Branch Context / Disclaimers**
@@ -219,7 +221,7 @@ function withdrawFromVault(ERC4626 erc4626Vault, uint256 assets) public {
 
 We now have the functionality to deposit and withdraw BPTs from a respective AuraPool from a ERC4626 Vault. As mentioned before, Aura is a yield optimizer protocol atop of Balancer that effectively carries out the same concepts as Convex atop of Curve. Users deposit BPTs into Aura and Aura takes a small fee for carrying out the necessary steps (such as staking 80/20 BPT - aka veBAL) to earn more $BAL via veBAL, etc. The protocol saves users time and money to get the most of the $BAL veBAL setup.
 
-The next step of the coding challenge is to create the implementation for a `getRewards()`. The function's purpose is to get rewards from the respective auraPool. 
+The next step of the coding challenge is to create the implementation for a `getRewards()`. The function's purpose is to get rewards from the respective auraPool. **Write the implementation code for `getRewards()` where it calls upon the helper `_getRewards()`.** This sequence is commonly used in case external protocols, so Aura in this case, upgrade and new adaptors need to be deployed that accomodate the new version. This is helpful to integrate into new contracts, aka new Aura pools with new versions of code implementation in this case. The new version would have a new `_getRewards()` implementation to work with.
 
 NOTE: there can be any number of different ERC20s used to incentivize different AuraPools. ex.) BAL, rETH, and random ERC20s like PEPE could be used to incentivize the rETH_wETH BPT AuraPool. We need a function that, when requested, will claim all rewards associated to the respective AuraPool.
 
@@ -316,7 +318,7 @@ Phew, now with that all said, let's dig into the code challenge again.
 
 ### **3.4 Part 2 Code Challenge Steps**
 
-1. Write overriding functions, if any, to override the `BaseAdaptor.sol` inherited by the `ERC4626Adaptor.sol`.
+1. Write overriding functions for the functions in the following subsections, if any, to override the `BaseAdaptor.sol` inherited by the `ERC4626Adaptor.sol`.
 2. Write overriding functions, if any, in `AuraERC4626Adaptor.sol`.
 
 #### **3.4.1 ERC4626Adaptor: `identifier()`, `balanceOf()`,`assetOf()`, `isDebt()` Implementation**

@@ -6,11 +6,11 @@ import { ERC4626 } from "@solmate/mixins/ERC4626.sol";
 
 /**
  * @title IERC4626Adaptor.sol
- * @author crispymangoes & 0xEinCodes originally. Edited to be a tutorial challenge by steve0xp
+ * @author crispymangoes, 0xEinCodes. Edited / Brought in to be a tutorial challenge by steve0xp
  * @notice A challenge outlining the concepts and some functions needed for current-day ERC4626s to integrate into protocols using protocol-bespoke functions. 
  * @dev The intent is to showcase how standards like ERC4626 push open-source collaboration, and continuously rely on it. The adaptors that Sommelier creates can be simplified to offer ERC4626 agnostic adaptors, where minimal extra auditing is needed. These effectively act as APIs for respective protocols and other ERC4626 projects.
- * @dev This Challenge showcases the steps for creating an adaptor. 
- * @dev Example of implementation used in Sommelier protocol found here: TODO: insert link for Aura developments. 
+ * @dev This Challenge showcases the steps for creating an adaptor. It 
+ * @dev Example of implementation used in Sommelier protocol found here: TODO: insert link for Aura devlopments. 
  * NOTE: A full yield aggregator protocol or any others using ERC 4626 vaults will likely need to keep track of pricing of BPTs wrt a base asset. This aspect is left up to the respective protocol to design and implement. Pricing examples using the Sommelier protocol pricing architecture are outlined to illustrate pricing the various types of BPTs.
  * NOTE: This adaptor and pricing derivatives focus on stablepool BPTs
  */
@@ -39,31 +39,36 @@ contract ERC4626Adaptor is BaseAdaptor {
 
     //============================================ Global Functions ===========================================
     /**
-     * @notice Encoded identifier unique to this adaptor for a shared registry.
-     * @return encoded string identifying adaptor w/ version number
+     * @dev Identifier unique to this adaptor for a shared registry.
+     * Normally the identifier would just be the address of this contract, but this
+     * Identifier is needed during Cellar Delegate Call Operations, so getting the address
+     * of the adaptor is more difficult.
      */
     function identifier() public pure virtual override returns (bytes32) {
-        // TODO: implementation code returning encoding string identifying adaptor
+        return keccak256(abi.encode("Sommelier General ERC4626 Adaptor V 0.0"));
     }
 
-    //============================================ Sommelier Cellar Base Functions Implementations  ===========================================
+    //============================================ Implement Base Functions ===========================================
     /**
      * @notice Cellar must approve ERC4626 position to spend its assets, then deposit into the ERC4626 position.
      * @param assets the amount of assets to deposit into the ERC4626 position
-     * @param adaptorData adaptor data containing the abi encoded ERC4626
+     * @param adaptorData adaptor data containining the abi encoded ERC4626
      * @dev configurationData is NOT used
      */
     function deposit(uint256 assets, bytes memory adaptorData, bytes memory) public virtual override {
+        // Deposit assets to `cellar`.
+        ERC4626 erc4626Vault = abi.decode(adaptorData, (ERC4626));
+        _verifyERC4626PositionIsUsed(address(erc4626Vault));
+        ERC20 asset = erc4626Vault.asset();
+        asset.safeApprove(address(erc4626Vault), assets);
+        erc4626Vault.deposit(assets, address(this));
 
-        // TODO: decode adaptorData to get the respective erc4626Vault
-        // TODO: verify that the ERC4626PositionIsUsed in Sommelier Architecture
-        // TODO: deposit assets to `erc4626Vault` from msg caller - NOTE: Sommelier protocol carries out delegate calls to this function.
-        // TODO: revoke any external approval for the erc4626Vault to handle the msg caller's assets.
-
+        // Zero out approvals if necessary.
+        _revokeExternalApproval(asset, address(erc4626Vault));
     }
 
     /**
-     * @notice Cellar needs to call withdraw on ERC4626 position, but must first check if position is liquid or not.
+     * @notice Cellar needs to call withdraw on ERC4626 position.
      * @dev Important to verify that external receivers are allowed if receiver is not Cellar address.
      * @param assets the amount of assets to withdraw from the ERC4626 position
      * @param receiver address to send assets to'
@@ -76,43 +81,47 @@ contract ERC4626Adaptor is BaseAdaptor {
         bytes memory adaptorData,
         bytes memory configurationData
     ) public virtual override {
+        // Check that position is setup to be liquid.
+        bool isLiquid = abi.decode(configurationData, (bool));
+        if (!isLiquid) revert BaseAdaptor__UserWithdrawsNotAllowed();
 
-        // TODO: decode configurationData for bool var indicating if position is liquid or not. If it is not liquid, what do you think should happen? Hint: in this scenario, the calling cellar would be wanting to withdraw funds out of any position it can. It would go through the most liquid positions first right? See Cellar code for more context. Thus, it would revert if the configData reported a falsey for whether the position was liquid or not.
-        // TODO: run external receiver check.
-        // TODO: withdraw assets from `cellar` --> decode the ERC4626 erc4626Vault from adaptorData. Verify the ERC4626 is used (see `_verifyERC4626PositionIsUsed()` helper)
-        // TODO: withdraw the actual assets to calling cellar. NOTE: Sommelier protocol carries out delegate calls to this function.
+        // Run external receiver check.
+        _externalReceiverCheck(receiver);
 
+        // Withdraw assets from `cellar`.
+        ERC4626 erc4626Vault = abi.decode(adaptorData, (ERC4626));
+        _verifyERC4626PositionIsUsed(address(erc4626Vault));
+        erc4626Vault.withdraw(assets, receiver, address(this));
     }
 
     /**
      * @notice Cellar needs to call `maxWithdraw` to see if its assets are locked.
-     * @dev See Cellar.sol within cellar-contracts repo from PeggyJV && cmd + f `withdrawableFrom()` to better understand how it works. Essentially there are checks throughout the `withdraw` tx flow where Cellar positions are checked for the type of position they are. If they are not debt, they can be withdrawn for example typically.
      */
     function withdrawableFrom(
         bytes memory adaptorData,
         bytes memory configurationData
     ) public view virtual override returns (uint256) {
-
-        // TODO: decode configurationData and get bool var indicating whether position isLiquid or not. If it is illiquid, revert.
-        // TODO: in accordance to erc4626 standard, obtain the max withdrawable amount of assets for the msg sender
-
+        bool isLiquid = abi.decode(configurationData, (bool));
+        if (isLiquid) {
+            ERC4626 erc4626Vault = abi.decode(adaptorData, (ERC4626));
+            return erc4626Vault.maxWithdraw(msg.sender);
+        } else return 0;
     }
 
     /**
      * @notice Uses ERC4626 `previewRedeem` to determine Cellars balance in ERC4626 position.
-     * @dev The Sommelier architecture requires that the function `balanceOf()` returns an appropriate, true, value of assets wihtin the respective Cellar position. This varies based on what external protocol the adaptor is allowing the Cellar to hold a position with said protocol. In the case of general ERC4626 vaults, Sommelier typically uses the `previewRedeem()` function within the erc4626 standard to evaluate the total balance of assets within an erc4626 vault for a user. 
      */
     function balanceOf(bytes memory adaptorData) public view virtual override returns (uint256) {
-        
-        // TODO: decode adaptorData to get ERC4626 erc4626Vault that the function will carry out an external function call, `previewRedeem()` to get the balance for the msg.sender
-
+        ERC4626 erc4626Vault = abi.decode(adaptorData, (ERC4626));
+        return erc4626Vault.previewRedeem(erc4626Vault.balanceOf(msg.sender));
     }
 
     /**
      * @notice Returns the asset the ERC4626 position uses.
      */
     function assetOf(bytes memory adaptorData) public view virtual override returns (ERC20) {
-        // TODO: `assetOf()` needs to decode param `bytes memory adaptorData` and return the underlying ERC20 within the ERC4626 Vault that the caller is depositing into said vault.
+        ERC4626 erc4626Vault = abi.decode(adaptorData, (ERC4626));
+        return ERC20(erc4626Vault.asset());
     }
 
     /**
@@ -130,9 +139,14 @@ contract ERC4626Adaptor is BaseAdaptor {
      * @param assets the amount of assets to deposit into `cellar`
      */
     function depositToVault(ERC4626 erc4626Vault, uint256 assets) public {
+        _verifyERC4626PositionIsUsed(address(erc4626Vault));
+        ERC20 asset = erc4626Vault.asset();
+        assets = _maxAvailable(asset, assets);
+        asset.safeApprove(address(erc4626Vault), assets);
+        erc4626Vault.deposit(assets, address(this));
 
-        // TODO: write implementation
-
+        // Zero out approvals if necessary.
+        _revokeExternalApproval(asset, address(erc4626Vault));
     }
 
     /**
@@ -141,9 +155,9 @@ contract ERC4626Adaptor is BaseAdaptor {
      * @param assets the amount of assets to withdraw from `cellar`
      */
     function withdrawFromVault(ERC4626 erc4626Vault, uint256 assets) public {
-       
-        // TODO: write implementation
-
+        _verifyERC4626PositionIsUsed(address(erc4626Vault));
+        if (assets == type(uint256).max) assets = erc4626Vault.maxWithdraw(address(this));
+        erc4626Vault.withdraw(assets, address(this), address(this));
     }
 
     //============================================ Helper Functions ===========================================
@@ -154,9 +168,10 @@ contract ERC4626Adaptor is BaseAdaptor {
      *      to get the calling Cellar.
      */
     function _verifyERC4626PositionIsUsed(address erc4626Vault) internal view {
-        
         // Check that erc4626Vault position is setup to be used in the calling cellar.
-        // TODO: write implementation
-
+        bytes32 positionHash = keccak256(abi.encode(identifier(), false, abi.encode(erc4626Vault)));
+        uint32 positionId = Cellar(address(this)).registry().getPositionHashToPositionId(positionHash);
+        if (!Cellar(address(this)).isPositionUsed(positionId))
+            revert ERC4626Adaptor__CellarPositionNotUsed(erc4626Vault);
     }
 }

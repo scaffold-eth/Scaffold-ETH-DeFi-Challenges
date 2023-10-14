@@ -1,14 +1,13 @@
 // SPDX-License-Identifier: Apache-2.0
 pragma solidity 0.8.21;
 
-import { MockDataFeed } from "src/mocks/MockDataFeed.sol";
+import { MockDataFeed } from "@cellar-contracts/src/mocks/MockDataFeed.sol";
 // Import Everything from Starter file.
-import "test/resources/MainnetStarter.t.sol";
-import { AdaptorHelperFunctions } from "test/resources/AdaptorHelperFunctions.sol";
-import { BalancerPoolAdaptor } from "src/modules/adaptors/Balancer/BalancerPoolAdaptor.sol";
+import "@cellar-contracts/test/resources/MainnetStarter.t.sol";
+import { AdaptorHelperFunctions } from "@cellar-contracts/test/resources/AdaptorHelperFunctions.sol";
 import { IVault, IERC20 } from "@balancer/interfaces/contracts/vault/IVault.sol";
-import { BalancerStablePoolExtension } from "src/modules/price-router/Extensions/Balancer/BalancerStablePoolExtension.sol";
-import { AuraERC4626Adaptor } from "src/modules/adaptors/Aura/AuraERC4626Adaptor.sol";
+import { BalancerStablePoolExtension } from "@cellar-contracts/src/modules/price-router/Extensions/Balancer/BalancerStablePoolExtension.sol";
+import { AuraERC4626Adaptor } from "src/AuraERC4626Adaptor.sol";
 
 /**
  * @title AuraERC4626AdaptorTest

@@ -9,8 +9,8 @@ import { ERC4626 } from "@solmate/mixins/ERC4626.sol";
 /**
  * @title Aura ERC4626 Adaptor
  * @dev This adaptor is specifically for Aura contracts.
- * @notice Carries out typical ERC4626Adaptor functionality and allows Cellars to claim rewards from AURA pools. This file was edited from the actual implementation code to be a challenge as part of the BUIDL GUIDL DeFi Challenges branch.
- * @author crispymangoes & 0xEinCodes originally. Edited to be a tutorial challenge by steve0xp
+ * @notice Carries out typical ERC4626Adaptor functionality and allows Cellars to claim rewards from AURA pools
+ * @author crispymangoes, 0xEinCodes
  * NOTE: Transferrance of aura-wrapped BPT is not alowed as per their contracts: ref - https://etherscan.io/address/0xdd1fe5ad401d4777ce89959b7fa587e569bf125d#code#F1#L254
  */
 contract AuraERC4626Adaptor is ERC4626Adaptor {
@@ -18,7 +18,7 @@ contract AuraERC4626Adaptor is ERC4626Adaptor {
     using Math for uint256;
 
     //==================== Adaptor Data Specification ====================
-    // adaptorData = abi.encode(address auraPool) 
+    // adaptorData = abi.encode(address auraPool) // TODO: CRISPY, the adaptor data comes out as an address even if we specify a different interface such as IERC4626 or ERC4626 right? So this should stay as `address auraPool` or should it be `ERC4626 auraPool`
     // Where:
     // `auraPool` is the AURA pool address position this adaptor is working with.
     //================= Configuration Data Specification =================
@@ -32,11 +32,13 @@ contract AuraERC4626Adaptor is ERC4626Adaptor {
 
     //============================================ Global Functions ===========================================
     /**
-     * @notice Encoded identifier unique to this adaptor for a shared registry.
-     * @return encoded string identifying adaptor w/ version number
+     * @dev Identifier unique to this adaptor for a shared registry.
+     * Normally the identifier would just be the address of this contract, but this
+     * Identifier is needed during Cellar Delegate Call Operations, so getting the address
+     * of the adaptor is more difficult.
      */
     function identifier() public pure virtual override returns (bytes32) {
-        // TODO: implementation code returning encoding string identifying adaptor
+        return keccak256(abi.encode("Aura ERC4626 Adaptor V 0.1"));
     }
 
     //============================================ Strategist Functions ===========================================
@@ -47,7 +49,8 @@ contract AuraERC4626Adaptor is ERC4626Adaptor {
      * @param _claimExtras Whether or not to claim extra rewards associated to the AuraPool (outside of rewardToken for AuraPool)
      */
     function getRewards(IBaseRewardPool _auraPool, bool _claimExtras) public {
-        // TODO: write implementation code
+        _validateAuraPool(address(_auraPool));
+        _getRewards(_auraPool, _claimExtras);
     }
 
     /**
@@ -55,9 +58,10 @@ contract AuraERC4626Adaptor is ERC4626Adaptor {
      * @dev This function uses `address(this)` as the address of the calling Cellar.
      */
     function _validateAuraPool(address _auraPool) internal view {
-       
-        // TODO: write implementation code
-
+        bytes32 positionHash = keccak256(abi.encode(identifier(), false, abi.encode(_auraPool)));
+        uint32 positionId = Cellar(address(this)).registry().getPositionHashToPositionId(positionHash);
+        if (!Cellar(address(this)).isPositionUsed(positionId))
+            revert AuraExtrasAdaptor__AuraPoolPositionsMustBeTracked(_auraPool); // TODO: troubleshoot uncommented implementation code here
     }
 
     //============================================ Interface Helper Functions ===========================================
@@ -69,8 +73,7 @@ contract AuraERC4626Adaptor is ERC4626Adaptor {
     //===============================================================================
 
     function _getRewards(IBaseRewardPool _auraPool, bool _claimExtras) internal virtual {
-
-        // TODO: write implementation code
-
+        _auraPool.getReward(address(this), _claimExtras); // TODO: confirm that any and all reward tokens associated to this position will be transferred from this external call.
+        // emit event so there is a record of the strategist claiming rewards, marking down a clear record.
     }
 }
