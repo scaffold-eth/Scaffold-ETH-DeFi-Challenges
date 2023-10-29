@@ -42,6 +42,8 @@ contract AuraERC4626AdaptorTest is MainnetStarterTest, AdaptorHelperFunctions {
     uint32 private auraExtras_RETH_WETH_BPT_Position = 7;
 
     uint256 public initialAssets;
+    ERC20 public aura_rETH_wETH_BPT = ERC20(0xDd1fE5AD401D4777cE89959b7fa587e569Bf125D);
+
 
     function setUp() external {
         // Setup forked environment.

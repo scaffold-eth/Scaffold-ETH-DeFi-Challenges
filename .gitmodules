@@ -12,3 +12,6 @@
 [submodule "lib/cellar-contracts"]
 	path = lib/cellar-contracts
 	url = https://github.com/PeggyJV/cellar-contracts
+[submodule "lib/solmate"]
+	path = lib/solmate
+	url = https://github.com/transmissions11/solmate
