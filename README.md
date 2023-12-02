@@ -286,7 +286,7 @@ However, we will now move onto Part Two of the challenge which encompasses writi
 
 ## ⛳️ **3.3 PART 2 Context: Integrating Sommelier Protocol Specifics** 🍷
 
-Sommelier is a decentralized asset management protocol specifically designed for the evolving DeFi ecosystem. The protocol uses "intelligent" vaults that dynamically adjust their composition based on current market conditions or predetermined metrics. Sommelier's unique architecture allows strategiests to leverage the power of off-chain computation using financial and data modeling techniques.
+Sommelier is a decentralized asset management protocol specifically designed for the evolving DeFi ecosystem. The protocol uses "intelligent" vaults that dynamically adjust their composition based on current market conditions or predetermined metrics. Sommelier's unique architecture allows strategists to leverage the power of off-chain computation using financial and data modeling techniques.
 
 Before continuing, it is very recommended to check out the Sommelier docs [here](https://sommelier-finance.gitbook.io/sommelier-documentation/introduction/what-is-sommelier) and make sure you pass through the goals listed below.
 
