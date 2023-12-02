@@ -19,7 +19,7 @@ This challenge is focused on guiding students through the following:
 
 💫 This challenge is part of the DeFi Sub-Branch, where students are invited to write smart contracts that incorporate actual DeFi protocols. The sub-branch projects are ever-expanding since DeFi is too.
 
-🦸🏼‍♀️ The goal of the Defi sub-branch project is to provide students tutorials that foster self-learning in actual DeFi protocols, guide them through some of the basics of integrating with specific protocols, and increase their competency to be potentially hireable as a developer.
+🦸🏼‍♀️ The goal of the Defi sub-branch projects are to provide students tutorials that foster self-learning in actual DeFi protocols, guide them through some of the basics of integrating with specific protocols, and increase their competency to be potentially hireable as a developer.
 
 > ❗️ NOTE: **Students taking on this challenge will be expected to embrace self-learning AND it is recommended that they have completed all beginner SRE challenges or show competency elsewhere.**
 
@@ -27,7 +27,7 @@ This challenge is focused on guiding students through the following:
 
 💡 The required competency is stated because tying into other protocols is powerful, and with that comes a lot of responsibility when deploying contracts that may end up holding people's actual funds. _These tutorials don't provide you that competency, but they start to show paths for people to become better educated. It is key to know what you are doing._
 
-Additionally, self-learning is required because DeFi protocols and actual professional crypto projects do not guide developers, step-by-step. If you are new to trying to actually plug into a professional project, no worries! 🤗
+As well, self-learning is required because DeFi protocols and actual professional crypto projects do not guide developers, step-by-step. If you are new to trying to actually plug into a professional project, no worries! 🤗
 
 We'll touch on some helpful tips as you sort out what the 'norm' is when going through this process. These tips will be specific to each protocol that we are integrating into and learning about.
 
@@ -272,7 +272,7 @@ contract AuraERC4626Adaptor is ERC4626Adaptor {
 
 ### 🥅 **3.2.2 Goals / Checks**
 
-- [ ] ❓ Your implementatino should have one external function and one internal function. The internal function is the one that actually carries out an external call to the respective AuraPool contract to `getRewards()` whereas the first function calls the internal function. This setup is carried out to allow for upgradeability incase Aura upgrades their smart contracts such that the internal function will not work anymore.
+- [ ] ❓ Your implementation should have one external function and one internal function. The internal function is the one that actually carries out an external call to the respective AuraPool contract to `getRewards()` whereas the first function calls the internal function. This setup is carried out to allow for upgradeability incase Aura upgrades their smart contracts such that the internal function will not work anymore.
 
 ### ✅ **3.2.3 Conclusion of Part 1**
 
@@ -286,7 +286,7 @@ However, we will now move onto Part Two of the challenge which encompasses writi
 
 ## ⛳️ **3.3 PART 2 Context: Integrating Sommelier Protocol Specifics** 🍷
 
-[TODO: insert commonly used description for Sommelier protocol and its advantages]
+Sommelier is a decentralized asset management protocol specifically designed for the evolving DeFi ecosystem. The protocol uses "intelligent" vaults that dynamically adjust their composition based on current market conditions or predetermined metrics. Sommelier's unique architecture allows strategiests to leverage the power of off-chain computation using financial and data modeling techniques.
 
 Before continuing, it is very recommended to check out the Sommelier docs [here](https://sommelier-finance.gitbook.io/sommelier-documentation/introduction/what-is-sommelier) and make sure you pass through the goals listed below.
 
@@ -300,15 +300,15 @@ For this part of the challenge, it is key to understand the notion of these feat
 
 Often, protocols will want to have permissioning and pricing mechanics to ensure proper accounting within the vaults they operate.
 
-Some reasons that permissioning is desirable include:
+Some reasons that permissioning would be desired include:
 
-- Requiring that vault asset management decisions be determined by token holders via a decentralized vote
-- Restricting vault management operations to only be implimented by designated strategists that are voted in via decentralized governance (token voting, or in Sommelier's case - validator and full chain goverannce setup)
-- Requiring a multisig controlled by designated Strategists that are voted in via token governance.
+- A protocol would want their token holders to carry out a decentralized vote to manage the vault assets, and not just anybody.
+- A protocol may have designated Strategists that are voted in via decentralized governance (token voting, or in Sommelier's case - validator and full chain goverannce setup). These Strategists may carry out vault management.
+- A protocol may have designated Strategists that makeup a multisig, of which are voted in via token governance.
 
-Some reasons that pricing is desirable include:
+Some reasons that pricing would be desired include:
 
-- Ensuring that no transaction that the Strategist carries out will lead to a full removal of assets within the Vault. This prevents rug-vectors essentially. Sommelier has a `Max_Deviation` where it takes the normalized price of the vault `totalAssets` and compares it before and after a transaction. It reverts if the `max_deviation` is exceeded.
+- Assurement that no transaction that the Strategist carries out will lead to a full removal of assets within the Vault. This prevents rug-vectors essentially. Sommelier has a Max_Deviation where it takes the normalized price of the vault totalAssets and compares it before and after a transaction. It reverts if the max_deviation is exceeded.
 - Accurate accounting of the APY of the respective vault.
 - Accurate accounting of the true value of the assets, especially within leveraged or lending positions (CDPs).
 
