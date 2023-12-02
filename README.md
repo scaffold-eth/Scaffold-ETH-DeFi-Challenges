@@ -13,13 +13,13 @@ This challenge is focused on guiding students through the following:
 
 > TODO: 💬 Meet other builders in the [DeFi Challenge 2 Telegram!](insert LINK HERE)
 
-## 💡✨ This serves as the first of possibly many ERC4626 Adaptor Challenges / Tutorials focused on the creation and usage of "APIs" for different external projects. If you are interested in writing new Challenges / Tutorials, please reach out to @steve0xp && @austingriffith.
+### 💡✨ This serves as the first of possibly many ERC4626 Adaptor Challenges / Tutorials focused on the creation and usage of "APIs" for different external projects. If you are interested in writing new Challenges / Tutorials, please reach out to @steve0xp && @austingriffith.
 
 ## **🚨 1.1 DeFi Sub-Branch Context / Disclaimers**
 
-💫 This challenge is part of the DeFi Sub-Branch, where students are invited into writing smart contracts that incorporate actual DeFi protocols. The sub-branch projects are ever-expanding since DeFi is too.
+💫 This challenge is part of the DeFi Sub-Branch, where students are invited to write smart contracts that incorporate actual DeFi protocols. The sub-branch projects are ever-expanding since DeFi is too.
 
-🦸🏼‍♀️ The goal of the Defi sub-branch projects/tutorials are to provide students tutorials that foster self-learning in actual DeFi protocols, guide you through some of the basics of integrating with specific protocols, and other useful tips to increase competence to be potentially hireable as a developer.
+🦸🏼‍♀️ The goal of the Defi sub-branch project is to provide students tutorials that foster self-learning in actual DeFi protocols, guide them through some of the basics of integrating with specific protocols, and increase their competency to be potentially hireable as a developer.
 
 > ❗️ NOTE: **Students taking on this challenge will be expected to embrace self-learning AND it is recommended that they have completed all beginner SRE challenges or show competency elsewhere.**
 
@@ -27,7 +27,7 @@ This challenge is focused on guiding students through the following:
 
 💡 The required competency is stated because tying into other protocols is powerful, and with that comes a lot of responsibility when deploying contracts that may end up holding people's actual funds. _These tutorials don't provide you that competency, but they start to show paths for people to become better educated. It is key to know what you are doing._
 
-As well, self-learning is required because tying into DeFi protocols and actual professional crypto projects do not guide developers, step-by-step. If you are new to trying to actually plug into a professional project, no worries! 🤗
+Additionally, self-learning is required because DeFi protocols and actual professional crypto projects do not guide developers, step-by-step. If you are new to trying to actually plug into a professional project, no worries! 🤗
 
 We'll touch on some helpful tips as you sort out what the 'norm' is when going through this process. These tips will be specific to each protocol that we are integrating into and learning about.
 
