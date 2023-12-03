@@ -42,8 +42,6 @@ contract AuraERC4626AdaptorTest is MainnetStarterTest, AdaptorHelperFunctions {
     uint32 private auraExtras_RETH_WETH_BPT_Position = 7;
 
     uint256 public initialAssets;
-    ERC20 public aura_rETH_wETH_BPT = ERC20(0xDd1fE5AD401D4777cE89959b7fa587e569Bf125D);
-
 
     function setUp() external {
         // Setup forked environment.
@@ -75,7 +73,6 @@ contract AuraERC4626AdaptorTest is MainnetStarterTest, AdaptorHelperFunctions {
         settings = PriceRouter.AssetSettings(CHAINLINK_DERIVATIVE, BAL_USD_FEED);
         priceRouter.addAsset(BAL, settings, abi.encode(stor), price);
 
-        // TODO: AURA doesn't have an AURA_USD Chainlink Feed. For now, we'll make it a mock price feed with WETH FEED
         price = uint256(IChainlinkAggregator(WETH_USD_FEED).latestAnswer());
         settings = PriceRouter.AssetSettings(CHAINLINK_DERIVATIVE, WETH_USD_FEED);
         priceRouter.addAsset(AURA, settings, abi.encode(stor), price);
@@ -83,7 +80,7 @@ contract AuraERC4626AdaptorTest is MainnetStarterTest, AdaptorHelperFunctions {
         // Add rETH_wETH_BPT pricing.
         uint8[8] memory rateProviderDecimals;
         address[8] memory rateProviders;
-        ERC20[8] memory underlyings; // TODO: check with CRISPY to get underlying order correct
+        ERC20[8] memory underlyings;
         underlyings[0] = WETH;
         underlyings[1] = rETH;
         BalancerStablePoolExtension.ExtensionStorage memory extensionStor = BalancerStablePoolExtension
@@ -194,7 +191,7 @@ contract AuraERC4626AdaptorTest is MainnetStarterTest, AdaptorHelperFunctions {
         deal(address(rETH_wETH_BPT), address(this), assets);
         cellar.deposit(assets, address(this)); // bpts sent to aura pool as seen in deposit() tests
 
-        vm.warp(block.timestamp + 100 days);
+        skip(100 days);
         mockWethUsd.setMockUpdatedAt(block.timestamp);
         mockRethUsd.setMockUpdatedAt(block.timestamp);
 
@@ -224,6 +221,7 @@ contract AuraERC4626AdaptorTest is MainnetStarterTest, AdaptorHelperFunctions {
 
     function testInterestAccrual(uint256 assets) external {
         assets = bound(assets, 0.1e18, 1_000_000_000e18);
+
         deal(address(rETH_wETH_BPT), address(this), assets);
         cellar.deposit(assets, address(this)); // bpts sent to aura pool as seen in deposit() tests
 
@@ -236,7 +234,6 @@ contract AuraERC4626AdaptorTest is MainnetStarterTest, AdaptorHelperFunctions {
         uint256 oldBPTBalance = rETH_wETH_BPT.balanceOf(address(cellar));
 
         Cellar.AdaptorCall[] memory data = new Cellar.AdaptorCall[](1);
-        // Withdraw FRAX from FraxLend.
         bool claimExtras = true;
         {
             bytes[] memory adaptorCalls = new bytes[](1);
@@ -245,7 +242,7 @@ contract AuraERC4626AdaptorTest is MainnetStarterTest, AdaptorHelperFunctions {
         }
 
         // Perform callOnAdaptor.
-        cellar.callOnAdaptor(data); // TODO: EIN, check the logs to see what reward tokens are claimed with bool set to false. Then compare to what it is as true.
+        cellar.callOnAdaptor(data); 
 
         assertGt(BAL.balanceOf(address(cellar)), oldBALRewards);
         assertGt(AURA.balanceOf(address(cellar)), oldAURARewards);
@@ -262,7 +259,6 @@ contract AuraERC4626AdaptorTest is MainnetStarterTest, AdaptorHelperFunctions {
         mockRethUsd.setMockUpdatedAt(block.timestamp);
 
         Cellar.AdaptorCall[] memory data = new Cellar.AdaptorCall[](1);
-        // Withdraw FRAX from FraxLend.
         bool claimExtras = true;
         {
             bytes[] memory adaptorCalls = new bytes[](1);

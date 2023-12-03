@@ -35,7 +35,7 @@ contract ERC4626Adaptor is BaseAdaptor {
     /**
      * @notice Strategist attempted to interact with a erc4626Vault with no position setup for it.
      */
-    error ERC4626Adaptor__CellarPositionNotUsed(address erc4626Vault);
+    error ERC4626Adaptor__ERC4626PositionNotUsed(address erc4626Vault);
 
     //============================================ Global Functions ===========================================
     /**
@@ -56,7 +56,7 @@ contract ERC4626Adaptor is BaseAdaptor {
      * @dev configurationData is NOT used
      */
     function deposit(uint256 assets, bytes memory adaptorData, bytes memory) public virtual override {
-        // Deposit assets to `cellar`.
+        // Deposit assets to `vault`.
         ERC4626 erc4626Vault = abi.decode(adaptorData, (ERC4626));
         _verifyERC4626PositionIsUsed(address(erc4626Vault));
         ERC20 asset = erc4626Vault.asset();
@@ -88,7 +88,7 @@ contract ERC4626Adaptor is BaseAdaptor {
         // Run external receiver check.
         _externalReceiverCheck(receiver);
 
-        // Withdraw assets from `cellar`.
+        // Withdraw assets from `Vault`.
         ERC4626 erc4626Vault = abi.decode(adaptorData, (ERC4626));
         _verifyERC4626PositionIsUsed(address(erc4626Vault));
         erc4626Vault.withdraw(assets, receiver, address(this));
@@ -136,7 +136,7 @@ contract ERC4626Adaptor is BaseAdaptor {
      * @notice Allows strategists to deposit into ERC4626 positions.
      * @dev Uses `_maxAvailable` helper function, see BaseAdaptor.sol
      * @param erc4626Vault the ERC4626 to deposit `assets` into
-     * @param assets the amount of assets to deposit into `cellar`
+     * @param assets the amount of assets to deposit into `Vault`
      */
     function depositToVault(ERC4626 erc4626Vault, uint256 assets) public {
         _verifyERC4626PositionIsUsed(address(erc4626Vault));
@@ -152,7 +152,7 @@ contract ERC4626Adaptor is BaseAdaptor {
     /**
      * @notice Allows strategists to withdraw from ERC4626 positions.
      * @param erc4626Vault the ERC4626 to withdraw `assets` from
-     * @param assets the amount of assets to withdraw from `cellar`
+     * @param assets the amount of assets to withdraw from `Vault`
      */
     function withdrawFromVault(ERC4626 erc4626Vault, uint256 assets) public {
         _verifyERC4626PositionIsUsed(address(erc4626Vault));
@@ -172,6 +172,6 @@ contract ERC4626Adaptor is BaseAdaptor {
         bytes32 positionHash = keccak256(abi.encode(identifier(), false, abi.encode(erc4626Vault)));
         uint32 positionId = Cellar(address(this)).registry().getPositionHashToPositionId(positionHash);
         if (!Cellar(address(this)).isPositionUsed(positionId))
-            revert ERC4626Adaptor__CellarPositionNotUsed(erc4626Vault);
+            revert ERC4626Adaptor__ERC4626PositionNotUsed(erc4626Vault);
     }
 }
