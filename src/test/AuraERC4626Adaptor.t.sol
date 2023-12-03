@@ -3,8 +3,8 @@ pragma solidity 0.8.21;
 
 import { MockDataFeed } from "@cellar-contracts/src/mocks/MockDataFeed.sol";
 // Import Everything from Starter file.
-import "@cellar-contracts/test/resources/MainnetStarter.t.sol";
-import { AdaptorHelperFunctions } from "@cellar-contracts/test/resources/AdaptorHelperFunctions.sol";
+import {MainnetStarterTest} from "lib/cellar-contracts/test/resources/MainnetStarter.t.sol";
+import { AdaptorHelperFunctions } from "lib/cellar-contracts/test/resources/AdaptorHelperFunctions.sol";
 import { IVault, IERC20 } from "@balancer/interfaces/contracts/vault/IVault.sol";
 import { BalancerStablePoolExtension } from "@cellar-contracts/src/modules/price-router/Extensions/Balancer/BalancerStablePoolExtension.sol";
 import { AuraERC4626Adaptor } from "src/AuraERC4626Adaptor.sol";
