@@ -1,17 +1,11 @@
-import { useMemo, useState } from "react";
-import { Abi } from "abitype";
-import { useContract, useProvider } from "wagmi";
-import { Spinner } from "~~/components/Spinner";
-import {
-  Address,
-  Balance,
-  getAllContractFunctions,
-  getContractReadOnlyMethodsWithParams,
-  getContractVariablesAndNoParamsReadMethods,
-  getContractWriteMethods,
-} from "~~/components/scaffold-eth";
+import { useReducer } from "react";
+import { ContractReadMethods } from "./ContractReadMethods";
+import { ContractVariables } from "./ContractVariables";
+import { ContractWriteMethods } from "./ContractWriteMethods";
+import { Spinner } from "~~/components/assets/Spinner";
+import { Address, Balance } from "~~/components/scaffold-eth";
 import { useDeployedContractInfo, useNetworkColor } from "~~/hooks/scaffold-eth";
-import { getTargetNetwork } from "~~/utils/scaffold-eth";
+import { useTargetNetwork } from "~~/hooks/scaffold-eth/useTargetNetwork";
 import { ContractName } from "~~/utils/scaffold-eth/contract";
 
 type ContractUIProps = {
@@ -23,33 +17,10 @@ type ContractUIProps = {
  * UI component to interface with deployed contracts.
  **/
 export const ContractUI = ({ contractName, className = "" }: ContractUIProps) => {
-  const provider = useProvider();
-  const [refreshDisplayVariables, setRefreshDisplayVariables] = useState(false);
-  const configuredNetwork = getTargetNetwork();
-
+  const [refreshDisplayVariables, triggerRefreshDisplayVariables] = useReducer(value => !value, false);
+  const { targetNetwork } = useTargetNetwork();
   const { data: deployedContractData, isLoading: deployedContractLoading } = useDeployedContractInfo(contractName);
   const networkColor = useNetworkColor();
-
-  const contract = useContract({
-    address: deployedContractData?.address,
-    abi: deployedContractData?.abi as Abi,
-    signerOrProvider: provider,
-  });
-
-  const displayedContractFunctions = useMemo(() => getAllContractFunctions(contract), [contract]);
-
-  const contractVariablesDisplay = useMemo(() => {
-    return getContractVariablesAndNoParamsReadMethods(contract, displayedContractFunctions, refreshDisplayVariables);
-  }, [contract, displayedContractFunctions, refreshDisplayVariables]);
-
-  const contractMethodsDisplay = useMemo(
-    () => getContractReadOnlyMethodsWithParams(contract, displayedContractFunctions),
-    [contract, displayedContractFunctions],
-  );
-  const contractWriteMethods = useMemo(
-    () => getContractWriteMethods(contract, displayedContractFunctions, setRefreshDisplayVariables),
-    [contract, displayedContractFunctions],
-  );
 
   if (deployedContractLoading) {
     return (
@@ -62,7 +33,7 @@ export const ContractUI = ({ contractName, className = "" }: ContractUIProps) =>
   if (!deployedContractData) {
     return (
       <p className="text-3xl mt-14">
-        {`No contract found by the name of "${contractName}" on chain "${configuredNetwork.name}"!`}
+        {`No contract found by the name of "${contractName}" on chain "${targetNetwork.name}"!`}
       </p>
     );
   }
@@ -82,15 +53,18 @@ export const ContractUI = ({ contractName, className = "" }: ContractUIProps) =>
                 </div>
               </div>
             </div>
-            {configuredNetwork && (
+            {targetNetwork && (
               <p className="my-0 text-sm">
                 <span className="font-bold">Network</span>:{" "}
-                <span style={{ color: networkColor }}>{configuredNetwork.name}</span>
+                <span style={{ color: networkColor }}>{targetNetwork.name}</span>
               </p>
             )}
           </div>
           <div className="bg-base-300 rounded-3xl px-6 lg:px-8 py-4 shadow-lg shadow-base-300">
-            {contractVariablesDisplay.methods.length > 0 ? contractVariablesDisplay.methods : "No contract variables"}
+            <ContractVariables
+              refreshDisplayVariables={refreshDisplayVariables}
+              deployedContractData={deployedContractData}
+            />
           </div>
         </div>
         <div className="col-span-1 lg:col-span-2 flex flex-col gap-6">
@@ -102,7 +76,7 @@ export const ContractUI = ({ contractName, className = "" }: ContractUIProps) =>
                 </div>
               </div>
               <div className="p-5 divide-y divide-base-300">
-                {contractMethodsDisplay.methods.length > 0 ? contractMethodsDisplay.methods : "No read methods"}
+                <ContractReadMethods deployedContractData={deployedContractData} />
               </div>
             </div>
           </div>
@@ -114,7 +88,10 @@ export const ContractUI = ({ contractName, className = "" }: ContractUIProps) =>
                 </div>
               </div>
               <div className="p-5 divide-y divide-base-300">
-                {contractWriteMethods.methods.length > 0 ? contractWriteMethods.methods : "No write methods"}
+                <ContractWriteMethods
+                  deployedContractData={deployedContractData}
+                  onChange={triggerRefreshDisplayVariables}
+                />
               </div>
             </div>
           </div>
