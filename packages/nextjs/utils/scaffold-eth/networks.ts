@@ -1,13 +1,17 @@
-import { Network } from "@ethersproject/networks";
-import * as chains from "wagmi/chains";
+import * as chains from "viem/chains";
 import scaffoldConfig from "~~/scaffold.config";
 
-export type TChainAttributes = {
+type ChainAttributes = {
   // color | [lightThemeColor, darkThemeColor]
   color: string | [string, string];
+  // Used to fetch price by providing mainnet token address
+  // for networks having native currency other than ETH
+  nativeCurrencyTokenAddress?: string;
 };
 
-export const NETWORKS_EXTRA_DATA: Record<string, TChainAttributes> = {
+export type ChainWithAttributes = chains.Chain & Partial<ChainAttributes>;
+
+export const NETWORKS_EXTRA_DATA: Record<string, ChainAttributes> = {
   [chains.hardhat.id]: {
     color: "#b8af0c",
   },
@@ -25,9 +29,11 @@ export const NETWORKS_EXTRA_DATA: Record<string, TChainAttributes> = {
   },
   [chains.polygon.id]: {
     color: "#2bbdf7",
+    nativeCurrencyTokenAddress: "0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0",
   },
   [chains.polygonMumbai.id]: {
     color: "#92D9FA",
+    nativeCurrencyTokenAddress: "0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0",
   },
   [chains.optimismGoerli.id]: {
     color: "#f01a37",
@@ -47,17 +53,16 @@ export const NETWORKS_EXTRA_DATA: Record<string, TChainAttributes> = {
   [chains.fantomTestnet.id]: {
     color: "#1969ff",
   },
+  [chains.scrollSepolia.id]: {
+    color: "#fbebd4",
+  },
 };
 
 /**
  * Gives the block explorer transaction URL.
- * @param network
- * @param txnHash
- * @dev returns empty string if the network is localChain
+ * Returns empty string if the network is a local chain
  */
-export function getBlockExplorerTxLink(network: Network, txnHash: string) {
-  const { chainId } = network;
-
+export function getBlockExplorerTxLink(chainId: number, txnHash: string) {
   const chainNames = Object.keys(chains);
 
   const targetChainArr = chainNames.filter(chainName => {
@@ -81,13 +86,15 @@ export function getBlockExplorerTxLink(network: Network, txnHash: string) {
 }
 
 /**
- * Gives the block explorer Address URL.
- * @param network - wagmi chain object
- * @param address
- * @returns block explorer address URL and etherscan URL if block explorer URL is not present for wagmi network
+ * Gives the block explorer URL for a given address.
+ * Defaults to Etherscan if no (wagmi) block explorer is configured for the network.
  */
 export function getBlockExplorerAddressLink(network: chains.Chain, address: string) {
   const blockExplorerBaseURL = network.blockExplorers?.default?.url;
+  if (network.id === chains.hardhat.id) {
+    return `/blockexplorer/address/${address}`;
+  }
+
   if (!blockExplorerBaseURL) {
     return `https://etherscan.io/address/${address}`;
   }
@@ -96,14 +103,11 @@ export function getBlockExplorerAddressLink(network: chains.Chain, address: stri
 }
 
 /**
- * @returns targetNetwork object consisting targetNetwork from scaffold.config and extra network metadata
+ * @returns targetNetworks array containing networks configured in scaffold.config including extra network metadata
  */
-
-export function getTargetNetwork(): chains.Chain & Partial<TChainAttributes> {
-  const configuredNetwork = scaffoldConfig.targetNetwork;
-
-  return {
-    ...configuredNetwork,
-    ...NETWORKS_EXTRA_DATA[configuredNetwork.id],
-  };
+export function getTargetNetworks(): ChainWithAttributes[] {
+  return scaffoldConfig.targetNetworks.map(targetNetwork => ({
+    ...targetNetwork,
+    ...NETWORKS_EXTRA_DATA[targetNetwork.id],
+  }));
 }

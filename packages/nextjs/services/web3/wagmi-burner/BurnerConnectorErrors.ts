@@ -6,7 +6,6 @@ export const BurnerConnectorErrorList = {
   couldNotConnect: "Could not connect to network",
   unsupportedBurnerChain: "This network is not supported for burner connector",
   chainIdNotResolved: "Cound not resolve chainId",
-  signerNotResolved: "Cound not resolve signer",
   chainNotSupported: "Chain is not supported, check burner wallet config",
 } as const;
 
