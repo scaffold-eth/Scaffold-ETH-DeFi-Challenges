@@ -23,6 +23,7 @@ This challenge is focused on guiding students through the following:
 2. [EIP 4626](https://eips.ethereum.org/EIPS/eip-4626)
 3. [Openzeppelin Docs on ERC4626](https://docs.openzeppelin.com/contracts/4.x/erc4626)
 4. [Aura docs](https://docs.aura.finance/)
+5. [Sommelier Website](https://www.sommelier.finance/)
 
 ## **🚨 1.1 DeFi Sub-Branch Context / Disclaimers**
 
