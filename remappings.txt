@@ -2,3 +2,4 @@
 @openzeppelin/=lib/openzeppelin-contracts/
 forge-std/=lib/forge-std/src/
 @cellar-contracts/=lib/cellar-contracts/
+@balancer=lib/cellar-contracts/lib/balancer-v2-monorepo/pkg
