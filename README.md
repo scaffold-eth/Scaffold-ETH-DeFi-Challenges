@@ -16,7 +16,7 @@ This challenge is focused on guiding students through the following:
 💡✨ This serves as the first of possibly many ERC4626 Adaptor Challenges / Tutorials focused on the creation and usage of "APIs" for different external projects. If you are interested in writing new Challenges / Tutorials, please reach out to @steve0xp && @austingriffith.
 ---
 
-## ** Prerequisite **  
+## **Prerequisite**  
 🙏 Please look into most of the links we have found that it makes the learning curve easier and faster 
 
 1. [ERC 20](https://ethereum.org/en/developers/docs/standards/tokens/erc-20/)
