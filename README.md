@@ -7,8 +7,8 @@
 This challenge is focused on guiding students through the following:
 
 - 💡 What ERC4626 Vaults are
-- 👀 The typical ins and outs of a Sommelier strategy to be aware of that Sommelier v2.5 Vaults (Cellars) take with their actual strategies. This challenge was based off of smart contract work carried out within this [repo](https://github.com/PeggyJV/cellar-contracts). 
-    - THIS CHALLENGE AND THE CODE INVOLVED IS NOT TO BE USED FOR PRODUCTION CODE. IT IS FOR EDUCATIONAL PURPOSES ONLY.
+- 👀 The typical ins and outs of a Sommelier strategy to be aware of that Sommelier v2.5 Vaults (Cellars) take with their actual strategies. This challenge was based on smart contract work carried out within this [repo](https://github.com/PeggyJV/cellar-contracts). 
+    - THIS CHALLENGE AND THE CODE INVOLVED ARE NOT TO BE USED FOR PRODUCTION CODE. IT IS FOR EDUCATIONAL PURPOSES ONLY.
 - 💪🏼 Writing this Sommelier Adaptor to integrate with Aura Protocol and getting experience dealing with some types of the basics.
 
 > TODO: 💬 Meet other builders in the [DeFi Challenge 2 Telegram!](insert LINK HERE)
@@ -16,9 +16,18 @@ This challenge is focused on guiding students through the following:
 💡✨ This serves as the first of possibly many ERC4626 Adaptor Challenges / Tutorials focused on the creation and usage of "APIs" for different external projects. If you are interested in writing new Challenges / Tutorials, please reach out to @steve0xp && @austingriffith.
 ---
 
+## **Prerequisite**  
+🙏 Please look into most of the links we have found that it makes the learning curve easier and faster 
+
+1. [ERC 20](https://ethereum.org/en/developers/docs/standards/tokens/erc-20/)
+2. [EIP 4626](https://eips.ethereum.org/EIPS/eip-4626)
+3. [Openzeppelin Docs on ERC4626](https://docs.openzeppelin.com/contracts/4.x/erc4626)
+4. [Aura docs](https://docs.aura.finance/)
+5. [Sommelier Website](https://www.sommelier.finance/)
+
 ## **🚨 1.1 DeFi Sub-Branch Context / Disclaimers**
 
-💫 This challenge is part of the DeFi Sub-Branch, where students are invited into writing smart contracts that incorporate actual DeFi protocols. The sub-branch projects are ever-expanding since DeFi is too.
+💫 This challenge is part of the DeFi Sub-Branch, where students are invited to write smart contracts that incorporate actual DeFi protocols. The sub-branch projects are ever-expanding since DeFi is too.
 
 🦸🏼‍♀️ The goal of the Defi sub-branch projects/tutorials are to provide students tutorials that foster self-learning in actual DeFi protocols, guide you through some of the basics of integrating with specific protocols, and other useful tips to increase competence to be potentially hireable as a developer.
 
