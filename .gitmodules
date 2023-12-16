@@ -1,3 +1,0 @@
-[submodule "lib/cellar-contracts"]
-	path = lib/cellar-contracts
-	url = https://github.com/peggyjv/cellar-contracts
