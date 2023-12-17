@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: Apache-2.0
 pragma solidity 0.8.21;
 
-import { BaseAdaptor, ERC20, SafeTransferLib, Cellar, PriceRouter, Math } from "@cellar-contracts/src/modules/adaptors/BaseAdaptor.sol";
-import { IBaseRewardPool } from "src/interfaces/IBaseRewardPool.sol"; // TODO: this will resolve once PeggyJV team has merged Aura Adaptor PR #141 --> https://github.com/PeggyJV/cellar-contracts/pull/141
-import { ERC4626Adaptor } from "src/interfaces/ERC4626Adaptor.sol"; // TODO: ""
-import { ERC4626 } from "@solmate/mixins/ERC4626.sol";
+import {BaseAdaptor, ERC20, SafeTransferLib, Cellar, PriceRouter, Math} from "@cellar-contracts/src/modules/adaptors/BaseAdaptor.sol";
+import {IBaseRewardPool} from "contracts/interfaces/IBaseRewardPool.sol"; // TODO: this will resolve once PeggyJV team has merged Aura Adaptor PR #141 --> https://github.com/PeggyJV/cellar-contracts/pull/141
+import {ERC4626Adaptor} from "contracts/interfaces/ERC4626Adaptor.sol"; // TODO: ""
+import {ERC4626} from "@solmate/mixins/ERC4626.sol";
 
 /**
  * @title Aura ERC4626 Adaptor
@@ -18,7 +18,7 @@ contract AuraERC4626Adaptor is ERC4626Adaptor {
     using Math for uint256;
 
     //==================== Adaptor Data Specification ====================
-    // adaptorData = abi.encode(address auraPool) 
+    // adaptorData = abi.encode(address auraPool)
     // Where:
     // `auraPool` is the AURA pool address position this adaptor is working with.
     //================= Configuration Data Specification =================
@@ -55,9 +55,7 @@ contract AuraERC4626Adaptor is ERC4626Adaptor {
      * @dev This function uses `address(this)` as the address of the calling Cellar.
      */
     function _validateAuraPool(address _auraPool) internal view {
-       
         // TODO: write implementation code
-
     }
 
     //============================================ Interface Helper Functions ===========================================
@@ -68,9 +66,10 @@ contract AuraERC4626Adaptor is ERC4626Adaptor {
     // implement new functionality.
     //===============================================================================
 
-    function _getRewards(IBaseRewardPool _auraPool, bool _claimExtras) internal virtual {
-
+    function _getRewards(
+        IBaseRewardPool _auraPool,
+        bool _claimExtras
+    ) internal virtual {
         // TODO: write implementation code
-
     }
 }
