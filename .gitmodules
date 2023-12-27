@@ -9,4 +9,4 @@
 	url = https://github.com/gnsps/solidity-bytes-utils
 [submodule "packages/foundry/lib/cellar-contracts"]
 	path = packages/foundry/lib/cellar-contracts
-	url = https://github.com/peggyjv/cellar-contracts
+	url = https://github.com/PeggyJV/cellar-contracts
