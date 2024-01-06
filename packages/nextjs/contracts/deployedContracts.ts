@@ -4,6 +4,329 @@
  */
 import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 
-const deployedContracts = {} as const;
+const deployedContracts = {
+  31337: {
+    AuraERC4626Adaptor: {
+      address: "0xd8A9159c111D0597AD1b475b8d7e5A217a1d1d05",
+      abi: [
+        {
+          type: "function",
+          name: "assetOf",
+          inputs: [
+            {
+              name: "adaptorData",
+              type: "bytes",
+              internalType: "bytes",
+            },
+          ],
+          outputs: [
+            {
+              name: "",
+              type: "address",
+              internalType: "contract ERC20",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "assetsUsed",
+          inputs: [
+            {
+              name: "adaptorData",
+              type: "bytes",
+              internalType: "bytes",
+            },
+          ],
+          outputs: [
+            {
+              name: "assets",
+              type: "address[]",
+              internalType: "contract ERC20[]",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "balanceOf",
+          inputs: [
+            {
+              name: "adaptorData",
+              type: "bytes",
+              internalType: "bytes",
+            },
+          ],
+          outputs: [
+            {
+              name: "",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "deposit",
+          inputs: [
+            {
+              name: "assets",
+              type: "uint256",
+              internalType: "uint256",
+            },
+            {
+              name: "adaptorData",
+              type: "bytes",
+              internalType: "bytes",
+            },
+            {
+              name: "",
+              type: "bytes",
+              internalType: "bytes",
+            },
+          ],
+          outputs: [],
+          stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
+          name: "depositToVault",
+          inputs: [
+            {
+              name: "erc4626Vault",
+              type: "address",
+              internalType: "contract ERC4626",
+            },
+            {
+              name: "assets",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          outputs: [],
+          stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
+          name: "getRewards",
+          inputs: [
+            {
+              name: "_auraPool",
+              type: "address",
+              internalType: "contract IBaseRewardPool",
+            },
+            {
+              name: "_claimExtras",
+              type: "bool",
+              internalType: "bool",
+            },
+          ],
+          outputs: [],
+          stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
+          name: "identifier",
+          inputs: [],
+          outputs: [
+            {
+              name: "",
+              type: "bytes32",
+              internalType: "bytes32",
+            },
+          ],
+          stateMutability: "pure",
+        },
+        {
+          type: "function",
+          name: "isDebt",
+          inputs: [],
+          outputs: [
+            {
+              name: "",
+              type: "bool",
+              internalType: "bool",
+            },
+          ],
+          stateMutability: "pure",
+        },
+        {
+          type: "function",
+          name: "revokeApproval",
+          inputs: [
+            {
+              name: "asset",
+              type: "address",
+              internalType: "contract ERC20",
+            },
+            {
+              name: "spender",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+          outputs: [],
+          stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
+          name: "slippage",
+          inputs: [],
+          outputs: [
+            {
+              name: "",
+              type: "uint32",
+              internalType: "uint32",
+            },
+          ],
+          stateMutability: "pure",
+        },
+        {
+          type: "function",
+          name: "withdraw",
+          inputs: [
+            {
+              name: "assets",
+              type: "uint256",
+              internalType: "uint256",
+            },
+            {
+              name: "receiver",
+              type: "address",
+              internalType: "address",
+            },
+            {
+              name: "adaptorData",
+              type: "bytes",
+              internalType: "bytes",
+            },
+            {
+              name: "configurationData",
+              type: "bytes",
+              internalType: "bytes",
+            },
+          ],
+          outputs: [],
+          stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
+          name: "withdrawFromVault",
+          inputs: [
+            {
+              name: "erc4626Vault",
+              type: "address",
+              internalType: "contract ERC4626",
+            },
+            {
+              name: "assets",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          outputs: [],
+          stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
+          name: "withdrawableFrom",
+          inputs: [
+            {
+              name: "adaptorData",
+              type: "bytes",
+              internalType: "bytes",
+            },
+            {
+              name: "configurationData",
+              type: "bytes",
+              internalType: "bytes",
+            },
+          ],
+          outputs: [
+            {
+              name: "",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "error",
+          name: "AuraExtrasAdaptor__AuraPoolPositionsMustBeTracked",
+          inputs: [
+            {
+              name: "auraPool",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+        },
+        {
+          type: "error",
+          name: "BaseAdaptor__ConstructorHealthFactorTooLow",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "BaseAdaptor__ExternalReceiverBlocked",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "BaseAdaptor__PricingNotSupported",
+          inputs: [
+            {
+              name: "asset",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+        },
+        {
+          type: "error",
+          name: "BaseAdaptor__Slippage",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "BaseAdaptor__UserDepositsNotAllowed",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "BaseAdaptor__UserWithdrawsNotAllowed",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "ERC4626Adaptor__ERC4626PositionNotUsed",
+          inputs: [
+            {
+              name: "erc4626Vault",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+        },
+      ],
+      inheritedFunctions: {
+        assetOf: "contracts/ERC4626Adaptor.sol",
+        assetsUsed: "contracts/ERC4626Adaptor.sol",
+        balanceOf: "contracts/ERC4626Adaptor.sol",
+        deposit: "contracts/ERC4626Adaptor.sol",
+        depositToVault: "contracts/ERC4626Adaptor.sol",
+        identifier: "contracts/ERC4626Adaptor.sol",
+        isDebt: "contracts/ERC4626Adaptor.sol",
+        revokeApproval: "contracts/ERC4626Adaptor.sol",
+        slippage: "contracts/ERC4626Adaptor.sol",
+        withdraw: "contracts/ERC4626Adaptor.sol",
+        withdrawFromVault: "contracts/ERC4626Adaptor.sol",
+        withdrawableFrom: "contracts/ERC4626Adaptor.sol",
+      },
+    },
+  },
+} as const;
 
 export default deployedContracts satisfies GenericContractsDeclaration;

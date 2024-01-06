@@ -25,6 +25,10 @@ contract DeployScript is ScaffoldETHDeploy {
         );
         vm.stopBroadcast();
 
+        deployments.push(
+            Deployment({name: "AuraERC4626Adaptor", addr: address(auraAdaptor)})
+        );
+
         /**
          * This function generates the file containing the contracts Abi definitions.
          * These definitions are used to derive the types needed in the custom scaffold-eth hooks, for example.

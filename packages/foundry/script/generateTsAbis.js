@@ -39,7 +39,9 @@ function getInheritedFromContracts(artifact) {
   for (const astNode of artifact.ast.nodes) {
     if (astNode.nodeType == "ContractDefinition") {
       if (astNode.baseContracts.length > 0) {
-        inheritedFromContracts = astNode.baseContracts.map(({baseName}) => baseName.name);
+        inheritedFromContracts = astNode.baseContracts.map(
+          ({ baseName }) => baseName.name
+        );
       }
     }
   }
@@ -96,16 +98,17 @@ function main() {
       (transaction) => transaction.transactionType == "CREATE"
     );
     transactionsCreate.forEach((transaction) => {
-      const artifact = getArtifactOfContract(transaction.contractName);
+      const artifact = getArtifactOfContract(
+        transaction.contractName ||
+          deployments[chain][transaction.contractAddress]
+      );
       allGeneratedContracts[chain][
         deployments[chain][transaction.contractAddress] ||
           transaction.contractName
       ] = {
         address: transaction.contractAddress,
         abi: artifact.abi,
-        inheritedFunctions: getInheritedFunctions(
-          artifact,
-        ),
+        inheritedFunctions: getInheritedFunctions(artifact),
       };
     });
   });
