@@ -3,7 +3,6 @@ pragma solidity ^0.8.19;
 
 import "./DeployHelpers.s.sol";
 import {AuraERC4626Adaptor} from "../contracts/Solutions/AuraERC4626Adaptor.sol";
-import {ERC4626Adaptor} from "../contracts/Solutions/ERC4626Adaptor.sol";
 
 contract DeployScript is ScaffoldETHDeploy {
     error InvalidPrivateKey(string);
@@ -16,13 +15,6 @@ contract DeployScript is ScaffoldETHDeploy {
             );
         }
         vm.startBroadcast(deployerPrivateKey);
-        ERC4626Adaptor erc4626Adapator = new ERC4626Adaptor();
-        console.logString(
-            string.concat(
-                "auraAdaptor contract deployed at: ",
-                vm.toString(address(erc4626Adapator))
-            )
-        );
 
         AuraERC4626Adaptor auraAdaptor = new AuraERC4626Adaptor();
         console.logString(
