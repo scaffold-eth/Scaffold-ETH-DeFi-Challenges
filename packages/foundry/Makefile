@@ -24,3 +24,7 @@ test-local  :; forge test
 trace-local  :; forge test -vvv
 clean  :; forge clean
 snapshot :; forge snapshot
+
+# Temporary fix so we can run "yarn fork" from the root directory of SE-2
+fork: 
+	@anvil --fork-url ${FORK_URL} --chain-id 31337 --config-out localhost.json
