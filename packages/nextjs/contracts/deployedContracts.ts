@@ -7,7 +7,7 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 const deployedContracts = {
   31337: {
     AuraERC4626Adaptor: {
-      address: "0xAE246E208ea35B3F23dE72b697D47044FC594D5F",
+      address: "0xa4d0806d597146df93796A38435ABB2a3cb96677",
       abi: [
         {
           type: "function",
