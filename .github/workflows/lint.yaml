@@ -3,56 +3,41 @@ name: Lint
 on:
   push:
     branches:
-    - master
+      - main
   pull_request:
+    branches:
+      - main
 
 jobs:
+  ci:
+    runs-on: ${{ matrix.os }}
 
-    solidity:
-      runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        node: [16.x]
 
-      steps:
-      - name: Check out github repository
-        uses: actions/checkout@v2
+    steps:
+      - name: Checkout
+        uses: actions/checkout@master
+
+      - name: Setup node env
+        uses: actions/setup-node@v3
         with:
-          fetch-depth: 1
+          node-version: ${{ matrix.node }}
+          cache : yarn
 
-      - name: Setup node.js
-        uses: actions/setup-node@v1
-        with:
-          node-version: '12.x'
+      - name: Install dependencies
+        run: yarn install --immutable
 
-      - name: Set yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
+      - name: Run hardhat node, deploy contracts (& generate contracts typescript output)
+        run: yarn chain & yarn deploy 
 
-      - name: Restore yarn cache
-        uses: actions/cache@v2
-        id: yarn-cache
-        with:
-          path: |
-            ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-            ${{ runner.os }}-yarn-
-      - name: Install node.js dependencies
-        run: yarn --frozen-lockfile
+      - name: Run nextjs lint
+        run: yarn next:lint --max-warnings=0
 
-      - name: Run formater check on *.sol and *.json
-        run: yarn format:check
+      - name: Check typings on nextjs
+        run: yarn next:check-types
 
-      - name: run linter check on *.sol file
-        run: yarn lint
-
-    commits:
-      runs-on: ubuntu-latest
-
-      steps:
-      - name: Check out github repository
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-
-      - name: Run commitlint
-        uses: wagoid/commitlint-github-action@v2
+      - name: Run hardhat lint
+        run: yarn hardhat:lint --max-warnings=0
