@@ -6,23 +6,29 @@
 
 This challenge is focused on guiding students through the following:
 
-- 💡 What ERC4626 Vaults are
-- 👀 The typical ins and outs of a Sommelier strategy to be aware of that Sommelier v2.5 Vaults (Cellars) take with their actual strategies. This challenge was based off of smart contract work carried out within this [repo](https://github.com/PeggyJV/cellar-contracts). 
-    - THIS CHALLENGE AND THE CODE INVOLVED IS NOT TO BE USED FOR PRODUCTION CODE. IT IS FOR EDUCATIONAL PURPOSES ONLY.
-- 💪🏼 Writing this Sommelier Adaptor to integrate with Aura Protocol and getting experience dealing with some types of the basics.
+💡 What ERC4626 Vaults are and how they are used in protocols like [Sommelier Finance](https://www.sommelier.finance/) (Sommelier).
+👀 The typical ins and outs of a Sommelier strategy to be aware of. 
+- This challenge was based off of smart contract work carried out within this [repo](https://github.com/PeggyJV/cellar-contracts). 
 
-> TODO: 💬 Meet other builders in the [DeFi Challenge 2 Telegram!](insert LINK HERE)
+💪🏼 Writing this Sommelier Adaptor to integrate with Aura Protocol and getting experience dealing with some types of the basics.
 
-💡✨ This serves as the first of possibly many ERC4626 Adaptor Challenges / Tutorials focused on the creation and usage of "APIs" for different external projects. If you are interested in writing new Challenges / Tutorials, please reach out to @steve0xp && @austingriffith.
+> THIS CHALLENGE AND THE CODE INVOLVED IS NOT TO BE USED FOR PRODUCTION CODE. IT IS FOR EDUCATIONAL PURPOSES ONLY.
+
+> TODO: 💬 Meet other builders in the [DeFi Challenge 2 Telegram!](insert LINK HERE). This group chat also acts as a hub for chatting all things Sommelier development. It does not replace Sommelier's discord and other comms channels.
+
+💡✨ This serves as the first of possibly many ERC4626 Adaptor Challenges / Tutorials focused on the creation and usage of "APIs" for different external projects. If you are interested in writing new Challenges / Tutorials, please reach out to @steve0xp && @austingriffith. 
+
 ---
 
-## **🚨 1.1 DeFi Sub-Branch Context / Disclaimers**
+## **🚨 1.0 DeFi Sub-Branch Context / Disclaimers**
 
 💫 This challenge is part of the DeFi Sub-Branch, where students are invited into writing smart contracts that incorporate actual DeFi protocols. The sub-branch projects are ever-expanding since DeFi is too.
 
-🦸🏼‍♀️ The goal of the Defi sub-branch projects/tutorials are to provide students tutorials that foster self-learning in actual DeFi protocols, guide you through some of the basics of integrating with specific protocols, and other useful tips to increase competence to be potentially hireable as a developer.
+🦸🏼‍♀️ The goal of the Defi sub-branch projects/tutorials are to provide students tutorials that foster self-learning in actual DeFi protocols, guide you through some of the basics of integrating with specific protocols, and other useful tips to increase competence. 
 
-> ❗️ NOTE: **Students taking on this challenge will be expected to embrace self-learning AND it is recommended that they have completed all beginner SRE challenges or show competency elsewhere.**
+This can be helpful if you're already an experienced dev simply looking to learn about specific portocols, or are looking to be hireable as a new developer.
+
+> ❗️ NOTE: Students taking on this challenge will be expected to embrace self-learning AND it is recommended that they have completed all beginner SRE challenges or show competency elsewhere. If you have not completed these, check them out [here](https://speedrunethereum.com/).
 
 <details markdown='1'><summary>👩🏽‍🏫 More Disclaimers </summary>
 
@@ -56,7 +62,7 @@ TODO: add instructions from the foundry branch to combine scaffold eth v2 and fo
 
 ## 🐇 **2.1 Sommelier Context**
 
-🎥👨🏻‍🏫 The Sommelier protocol (Sommelier) is a Yield Aggregator project that has "Strategists" manage on-chain ERC4626 Vaults via the $SOMM chain infrastructure ($SOMM Validator sets, encoded-message transferrance via the Gravity Bridge, and $SOMM Governance). The project touts over 2X growth in TVL (now at 40+Million TVL) over the last 5-6 months and currently operates on Ethereum mainnet.
+🎥👨🏻‍🏫 [The Sommelier protocol (Sommelier)](https://www.sommelier.finance/) is a Yield Aggregator project that has "Strategists" manage on-chain ERC4626 Vaults (often called Cellars) via the $SOMM chain infrastructure ($SOMM Validator sets, encoded-message transferrance via the Gravity Bridge, and $SOMM Governance). The project touts over 70X growth in TVL (from 1 million to 70 million TVL at peak) over the last 12 months and currently operates on Ethereum mainnet.
 
 Since Sommelier uses ERC4626 Vaults, it requires new smart contracts to be made to integrate external protocols to its ERC4626 Vaults. These smart contracts are referred to as `Adaptors`. This tutorial / challenge serves as a written  walkthrough for creating `Adaptors`.
 
@@ -65,9 +71,8 @@ This tutorial is broken into two main parts:
 1. ERC4626Agnostic Adaptors: Construction of an ERC4626 Agnostic Adaptor so any ERC4626 Vault can use the core functionalities of it.
 2. Sommelier-Specifics: Addition of Sommelier Specific aspects to make the Adaptor integratable with the Sommelier Tech Stack.
 
----
 
-If you have questions that are outside of the scope of this challenge's TG group chat then we recommend trying to ask a question in the [Sommelier Discord](https://discord.com/invite/ZcAYgSBxvY). As well, feel free to make PRs to the [Sommelier Smart Contracts Github](https://github.com/PeggyJV/cellar-contracts).
+> If you have questions that are outside of the scope of this challenge's TG group chat then we recommend trying to ask a question in the [Sommelier Discord](https://discord.com/invite/ZcAYgSBxvY). As well, feel free to make PRs to the [Sommelier Smart Contracts Github](https://github.com/PeggyJV/cellar-contracts).
 
 Let's get into it! 👨🏻‍💻🧑🏻‍💻👩🏻‍💻
 
@@ -95,9 +100,9 @@ For each Vault there are typically multiple strategies. These can take various f
 
 These could be as simple as swapping the base asset for a collection of different assets, or using said base asset in LPing positions to generate trading fees. Example in the below image: a `baseAsset` is distributed to different strategies where certain amounts have allocations to it. 
 
-The first part of the tutorial will go through creating adaptors that work for any ERC4626 vault, such that numerous positions could be had with different adaptors for each vault as seen in the below schematic.
+The first part of the tutorial will go through creating adaptors that work for any ERC4626 vault, such that numerous positions could be had with different adaptors for each vault as seen in the below schematic of the Sommelier smart contract architecture (found in their [docs](https://sommelier-finance.gitbook.io/sommelier-documentation/smart-contracts/protocol-v2-contract-architecture)).
 
-![image](./images/High-LevelSommelierSmartContractArchitecture.jpeg) TODO: replace this with Sommelier's proper schematics
+![image](./images/Sommelier_Protocol_Smart_Contract_Architecture.jpeg)
 
 💡 Recall: Here, Sommelier Vaults are secure entities that have ownership of the digital assets in question. Within Sommelier, users interact with vaults mainly in the UI, and deposit or withdraw tokens into respective vaults that are isolated to a specific token.
 
@@ -126,15 +131,15 @@ There are several template contracts that we will go through, and/or write the i
 Within #2 and #3, there are empty functions that require implementation logic. These will be what we focus on throughout the tutorial.
 ## ⛳️ **3.1 Checkpoint 1: Integrating into Adaptors Breakdown** ⚖️
 
-Now that you understand ERC4626 Vaults more, you should be able to see how Adaptors act as "APIs" for ERC4626 Vaults to interact with different external protocols. 
+Now that you understand ERC4626 Vaults more, you should be able to see how Adaptors act as "APIs" for ERC4626 Vaults to interact with different external protocols. This is not necessarily how adaptors are created in production. In production, they are often created without considering how to make an adaptor fully ERC4626 agnostic, simply because they are created for use within the Sommelier protocol. For educational purposes, this tutorial breaks it down into ERC4626 agnostic versions before the Sommelier-Bespoke implementation.
 
-We will work with the starting `IERC4626ExternalProtocolAdaptor.sol` contract that Sommelier provides. TODO: not sure if we want to state it like this, get opinions of Sommelier smart contracts developers and team to see if they are rolling out an interface like this to educate others on building adaptors. 
+We will work with the starting `IERC4626ExternalProtocolAdaptor.sol` contract created for this educational tutorial.
 
-As you can see, the `IERC4626ExternalProtocolAdaptor.sol` is really just a blank interface file outlining the typical steps involved when creating an adaptor to integrate with an external protocol.
+> As you can see, the `IERC4626ExternalProtocolAdaptor.sol` is really just a blank interface file outlining the typical steps involved when creating an adaptor to integrate with an external protocol.
 
 In the context of Sommelier, Strategist Functions, are specific functions that serve "API" purposes that the vault can exercise. These are called upon by approved "Strategists" for the Sommelier protocol.
 
-In the case of other protocols using ERC4626 Vaults, say you are working on your own ERC4626 protocol, then you'd apply whatever permissions you want, or don't want, to the Strategist functions accordingly.
+> In the case of other protocols using ERC4626 Vaults, say you are working on your own ERC4626 protocol, then you'd apply whatever permissions you want, or don't want, to the Strategist functions accordingly.
 
 Moving on, we'll start working through the challenge files `AuraERC4626Adaptor.sol` && `ERC46262Adaptor.sol`.
 
@@ -144,17 +149,18 @@ Let's start with `ERC46262Adaptor.sol` first.
 
 This adaptor allows ERC4626 vaults to integrate with other general ERC4626 vaults. Imagine your EOA, like a Metamask Wallet, interacting with an external protocol like Aura. It would simply carry out function txs behind the scenes as you interact with the UI. Well, for vaults one must either manually  created encoded calls, via numerous methods like Gnosis Transaction Builder, etc., or interact with an adaptor contract. The reason an adaptor contract is used within the Sommelier protocol is because the Sommelier vaults exist within a permissioned system within Sommelier, where Governance determines what positions / protocols a respective ERC 4626 Vault can even interact with. 
 
-> If Sommelier and other protocols did not take precautions such as only approving certain positions within ERC4626 Vaults && for their Strategists to engage with, malicious vault positions could take root. Ex.) We could have a vault interact with a random unverified smart contract that actually has a `RugVault()` function on it.
+> 😱 If Sommelier and other protocols did not take precautions such as only approving certain positions within ERC4626 Vaults && for their Strategists to engage with, malicious vault positions could take root. Ex.) We could have a vault interact with a random unverified smart contract that actually has a `RugVault()` function on it. 😱
 
-To get the most of this tutorial, you need to really read the docs of the protocol that you are integrating into, Aura in this case, and find the external function calls to make from your own smart contract. It is key to look at actual transactions on "in-prod" deployments. So here, it is key to check out an actual AuraPool BPT tx that carries out mutative state changes resulting in deposited or redeemed assets. Luckily, when it comes to interacting with the AuraPools, the AuraPools on Mainnet adhere to the ERC4626 standard. Therefore, we can treat AuraPools just like any other ERC4626 vault excpt for other aspects that may be special for AuraPools (such as claiming rewards). When you go through this, you'll find that, in terms of generic ERC4626 functionality, this contract allows one to `depositToVault()` and `withdrawFromVault()`.
+To get the most of this tutorial, you need to really read the docs of the protocol that you are integrating into, Aura in this case, and find the external function calls to make from your own smart contract. It is key to look at actual transactions on "in-prod" deployments. So in this case, check out an actual AuraPool BPT tx that carries out mutative state changes resulting in deposited or redeemed assets. Luckily, when it comes to interacting with the AuraPools, the AuraPools on Mainnet adhere to the ERC4626 standard. Therefore, we can treat AuraPools just like any other ERC4626 vault except for other aspects that may be special for AuraPools (such as claiming rewards). When you go through this, you'll find that, in terms of generic ERC4626 functionality, this contract allows one to `depositToVault()` and `withdrawFromVault()`. TODO:  find etherscan txs to help students.
 
 With the knowledge you've picked up from reading the references mentioned for ERC4626, write the `depositToVault()` and `withdrawFromVault()` functions with the perspective of this contract being used by a _calling Vault_ to a _callee Vault_.
 
 ### **3.1.2 Hints:**
-- Bring in the appropriate imports, `ERC20` and `ERC4626`
-- The _calling Vault_ will need to have the correct `asset` that the _callee Vault_ receives. For this tutorial, we will use the `rETH_wETH_BPT`. So the `depositToVault()` function will deposit the respective `asset` for the _callee Vault_.
-- The reverse happens for `withdrawFromVault()`, where the `callee Vault asset` will be withdrawn from the _callee Vault_ back to the _calling Vault_.
-- Make sure to cancel out any `approvals` for general transaction cleanliness.
+1. Bring in the appropriate imports, `ERC20` and `ERC4626`
+
+2. The _calling Vault_ will need to have the correct `asset` that the _callee Vault_ receives. For this tutorial, we will use the `rETH_wETH_BPT`. So the `depositToVault()` function will deposit the respective `asset` for the _callee Vault_.
+3. The reverse happens for `withdrawFromVault()`, where the `callee Vault asset` will be withdrawn from the _callee Vault_ back to the _calling Vault_.
+4. Make sure to cancel out any `approvals` for general transaction cleanliness.
 
 <details markdown='1'><summary>👩🏽‍🏫 Solution Code for `imports` and inheritance </summary>
 Inside `ERC4626Adaptor.sol`
@@ -208,26 +214,27 @@ function withdrawFromVault(ERC4626 erc4626Vault, uint256 assets) public {
 
 ### 🥅 **3.1.3 Goals / Checks**
 
-- [ ] 📞 Your implementation should have two separte functions that deposit BPTs into the AuraPool (which follows the ERC4626 standard), and another that withdraws BPTs from the AuraPool. Is your contract doing this?
+- [ ] 📞 Your implementation should have two separate functions that deposit BPTs into the AuraPool (which follows the ERC4626 standard), and another that withdraws BPTs from the AuraPool. Is your contract doing this?
 - [ ] If you run `git submodule update --init --recursive`, do you get the appropriate imports to work?
-   - [ ] Make sure foundry is installed on your machine, and you've ran `npm install` beforehand.
+   - [ ] Make sure foundry is installed on your machine, and you've ran `npm install` beforehand. If you haven't yet, just run it now!
 
---
+--- 
 ## ⛳️ **3.2 Checkpoint 2: AuraERC4626Adaptor `getRewards()` Implementation** ⚖️
 
 We now have the functionality to deposit and withdraw BPTs from a respective AuraPool from a ERC4626 Vault. As mentioned before, Aura is a yield optimizer protocol atop of Balancer that effectively carries out the same concepts as Convex atop of Curve. Users deposit BPTs into Aura and Aura takes a small fee for carrying out the necessary steps (such as staking 80/20 BPT - aka veBAL) to earn more $BAL via veBAL, etc. The protocol saves users time and money to get the most of the $BAL veBAL setup.
 
-**The next step of the coding challenge is to Write the implementation code for `getRewards()` where it calls upon the helper `_getRewards()`.** The function's purpose is to get rewards from the respective auraPool. This sequence where the function calls an internal helper function is commonly used in case external protocols, so Aura in this case, upgrade and new adaptors need to be deployed that accomodate the new version. This is helpful to integrate into new contracts, aka new Aura pools with new versions of code implementation in this case. The new version would have a new `_getRewards()` implementation to work with.
+**The next step of the coding challenge is to Write the implementation code for `getRewards()` where it calls upon the helper `_getRewards()`.** The function's purpose is to get rewards from the respective auraPool. 
 
-NOTE: there can be any number of different ERC20s used to incentivize different AuraPools. ex.) BAL, rETH, and random ERC20s like PEPE could be used to incentivize the rETH_wETH BPT AuraPool. We need a function that, when requested, will claim all rewards associated to the respective AuraPool.
+This 'sequence' where the function calls an internal helper function is commonly used in case external protocols, such as Aura, carry out an upgrade, and thus new adaptors need to be deployed that accomodate said new version. The underlying helper function can get overridden to have the proper implementation neded for said new version. This is helpful to integrate into new contracts, aka new Aura pools with new versions of code implementation in this case. The new version would have a new `_getRewards()` implementation to work with.
 
-**Recall the architecture of the adaptor, and how the AuraERC4626Adaptor _inherits_ the ERC4626Adaptor. Make sure to write the code accordingly.**
+NOTE: there can be any number of different ERC20s used to incentivize different AuraPools. ex.) BAL, rETH, and random ERC20s like $PEPE could be used to incentivize the rETH_wETH BPT AuraPool. We need a function that, when requested, will claim all rewards associated to the respective AuraPool.
+
+> **Recall the architecture of the adaptor, and how the AuraERC4626Adaptor _inherits_ the ERC4626Adaptor. Make sure to write the code accordingly.**
 
 ### **3.2.1 Hints:**
-- A major part of this challenge, repeated again here, is to dig into the docs of the related protocols. In this case, it is Aura. Search through their actual deployed pools on their app, find their actual deployed contract on mainnet, open it on dethscan, and go through the codebase to understand the main external hooks/functions that protocols are to call to integrate with it. Check out actual transactions of users claiming rewards from auraPools. Explore what is happening in those function calls to get a full understanding of how Aura works under the hood when rewards are claimed to be sure you're calling the right function calls.
-- ie.) 
-    - [Aura reth_weth_bpt on app](https://app.aura.finance/#/1/pool/109)
-    - [rETH_wETH_BPT AuraPool deployed code in DethScan](https://etherscan.deth.net/address/0xDd1fE5AD401D4777cE89959b7fa587e569Bf125D), make sure to check out the actual etherscan deployed address and traces of transactions where users claim rewards, which you can find using the address in this URL in etherscan.
+A major part of this challenge, repeated again here, is to dig into the docs of the related protocols. In this case, it is Aura. Search through their actual deployed pools on their app, find their actual deployed contract on mainnet, open it on dethscan, and go through the codebase to understand the main external hooks/functions that protocols are to call to integrate with it. Check out actual transactions of users claiming rewards from auraPools. Explore what is happening in those function calls to get a full understanding of how Aura works under the hood when rewards are claimed to be sure you're calling the right function calls.
+- [Aura reth_weth_bpt on the Aura App](https://app.aura.finance/#/1/pool/109)
+- [rETH_wETH_BPT AuraPool deployed code in DethScan](https://etherscan.deth.net/address/0xDd1fE5AD401D4777cE89959b7fa587e569Bf125D), make sure to check out the actual etherscan deployed address and traces of transactions where users claim rewards, which you can find using the address in this URL in etherscan.
 
 <details markdown='1'><summary>👩🏽‍🏫 Solution Code for `imports` and inheritance </summary>
 Inside `ERC4626Adaptor.sol`
@@ -274,17 +281,19 @@ contract AuraERC4626Adaptor is ERC4626Adaptor {
 
 ### ✅ **3.2.3 Conclusion of Part 1**
 
-At this point, we now have the implmentation code necessary to do external calls from an ERC4626 Vault to an AuraPool. Arguably something like this, with unit tests, audits, and adjustments would be able to be deployed and used as a public good interface/router to AuraPools. 
+🎉🥳 WOOHOO Congrats!!! You've completed part 1. At this point, we now have the implmentation code necessary to do external calls from an ERC4626 Vault to an AuraPool. Arguably something like this, with unit tests, audits, and adjustments would be able to be deployed and used as a public good interface/router to AuraPools. 
 
-However, we will now move onto Part Two of the challenge which encompasses writing the implementation code relevant to having this adaptor work within the Sommelier architecture. 
+> TAKE A WELL DESERVED BREAK. THIS TUTORIAL IS A LONG ONE. TOUCH SOME GRASS ANON. 🌳👋🏼
 
-**NOTE: This will outline just one method of adding aspects like permissioning and pricing, whereas many different designs can be used. This can be seen when comparing protocols like Sommelier to other protocols such as Yearn.**
+Done your break? OK. We will now move onto Part Two of the challenge which encompasses writing the implementation code relevant to having this adaptor work within the Sommelier architecture. 
+
+> **NOTE: This will outline just one method of adding aspects like permissioning and pricing, whereas many different designs can be used. This can be seen when comparing protocols like Sommelier to other protocols such as Yearn.**
 
 ---
 
 ## ⛳️ **3.3 PART 2 Context: Integrating Sommelier Protocol Specifics** 🍷
 
-[TODO: insert commonly used description for Sommelier protocol and its advantages]
+Sommelier is a decentralized asset management protocol, built on the Cosmos SDK, with a bridge to high-value EVM networks. They offer a truly decentralized solution to yield aggregation since they are governed by their own blockchain, and they are now beginning to voyage into multi-chain and cross-chain strategies.
 
 Before continuing, it is very recommended to check out the Sommelier docs [here](https://sommelier-finance.gitbook.io/sommelier-documentation/introduction/what-is-sommelier) and make sure you pass through the goals listed below.
 ### 🥅 **3.3.1 Goals / Checks**
@@ -292,7 +301,12 @@ Before continuing, it is very recommended to check out the Sommelier docs [here]
 For this part of the challenge, it is key to understand the notion of these features of the Sommelier protocol:
 
 - [ ] Can you explain the core concepts of `Registry`, `PriceRouter`, `Cellar`, and `Adaptor`?
+    - Hint: check out [The Protocol Contract Architecture](https://sommelier-finance.gitbook.io/sommelier-documentation/smart-contracts/protocol-v2-contract-architecture) and the [Advanced Smart Contracts](https://sommelier-finance.gitbook.io/sommelier-documentation/smart-contracts/advanced-smart-contracts) sections.
+- [ ] Can you explain this high level archictecture? Without understanding the general architecture, you will struggle with understanding why certain implementations are carried out within the adaptor.
 
+![image](./images/Sommelier_Protocol_Smart_Contract_Architecture.jpeg)
+
+    
 ### 💡**3.3.2 A Note About Pricing and Permissioning**
 
 Often, protocols will want to have permissioning, and pricing mechanics to ensure proper accounting within the vaults they operate. 
@@ -302,15 +316,26 @@ Some reasons that permissioning would be desired include:
 - A protocol may have designated Strategists that are voted in via decentralized governance (token voting, or in Sommelier's case - validator and full chain goverannce setup). These Strategists may carry out vault management.
 - A protocol may have designated Strategists that makeup a multisig, of which are voted in via token governance.
 
+Below is a high-level breakdown of how the permissions work when adding an asset and subsequently using the newly added asset within a rebalance from the Strategist for the respective cellar.
+
+![image](./images/Registry-Focused High-Level Schematic.jpeg)
+
 Some reasons that pricing would be desired include:
 - Assurement that no transaction that the Strategist carries out will lead to a full removal of assets within the Vault. This prevents rug-vectors essentially. Sommelier has a `Max_Deviation` where it takes the normalized price of the vault `totalAssets` and compares it before and after a transaction. It reverts if the `max_deviation` is exceeded.
 - Accurate accounting of the APY of the respective vault.
 - Accurate accounting of the true value of the assets, especially within leveraged or lending positions (CDPs).
 
+> For the AuraERC4626Adaptor we are focusing on today, it will actually end up using pricing extensions. Essentially the price router from it's early days of development have leaned on using chainlink price feeds. Over time the price router has evolved to now be able to use multiple pricing sources. One of which is a `PricingExtension` as shown below:
+
+![image](./images/PriceRouter_Specifics_PricingExtensions.jpeg)
+
+The pricing extension is used to price the underlying BPT for the AuraERC4626Adaptor in a respective cellar position.
+
 For Sommelier, we see that the `PriceRouter.sol`, `Cellar.sol`, and `Registry.sol` work with each `Cellar`'s `Adaptor Positions` to keep track of the accounting of permissioned Cellar positions.
 
 Phew, now with that all said, let's dig into the code challenge again.
 
+---
 ### **3.4 Part 2 Code Challenge Steps**
 
 1. Write overriding functions for the functions in the following subsections, if any, to override the `BaseAdaptor.sol` inherited by the `ERC4626Adaptor.sol`.
@@ -322,7 +347,7 @@ These functions are called throughout the general setup and operation "flow" of 
 
 1. `identifier()` simply needs to return the keccak256 hash of the name of the adaptor in a string.
 
-2. `balanceOf()` needs to decode param `bytes memory adaptorData` and return the balance of the ERC4626Vault share token allocated to the caller (Sommelier Cellar). TODO: elaborate somewhere on what adaptorData is.
+2. `balanceOf()` needs to decode param `bytes memory adaptorData` and return the balance of the ERC4626Vault share token allocated to the caller (Sommelier Cellar). More info for what `adaptorData` is can be found in the Sommelier [docs](https://sommelier-finance.gitbook.io/sommelier-documentation/smart-contracts/external-protocol-integration/building-adaptors/adaptor-configuration).
 
 3. `assetOf()` needs to decode param `bytes memory adaptorData` and return the underlying ERC20 within the ERC4626 Vault that the caller is depositing into said vault.
 
@@ -479,7 +504,7 @@ The ERC4626 adaptor will need to validate that the passed param `address erc4626
 
 The Sommelier protocol currently uses encoded `positionHash` variables as the key to a mapping `getPositionHashToPositionId` pointing to uint32 `positionIds`. This mapping is used in conjunction to `isPositionUsed()` within each Cellar. Each Cellar, upon setup of a new position, must ensure that the respective `adaptor` is trusted. This is done via having the Cellar call the functions necessary to add the adaptor to its `Catalogue`. 
 
-The Aura adaptor will need to validate that the passed param `address _auraPool` is trusted by the respective calling Cellar. With the description of the above setup with the Cellar, positionHash, positionIds, etc. write the helper `_validateAuraPool()` wi0thin `AuraERC4626Adaptor.sol`.
+The Aura adaptor will need to validate that the passed param `address _auraPool` is trusted by the respective calling Cellar. With the description of the above setup with the Cellar, positionHash, positionIds, etc. write the helper `_validateAuraPool()` within `AuraERC4626Adaptor.sol`.
 
 > 💡 _Hint:_ TODO:
 
