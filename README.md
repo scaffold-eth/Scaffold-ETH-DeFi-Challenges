@@ -46,8 +46,6 @@ We'll touch on some helpful tips as you sort out what the 'norm' is when going t
 
 🚦 To start the challenge, clone the repo to your local machine using the following CLI commands:
 
-TODO: add instructions from the foundry branch to combine scaffold eth v2 and foundry together.
-
 1. Clone the repo onto your local machine and install the submodules: `git clone --recursive <repo link>`
 
    > NOTE: If you have not installed the submodules, probably because you ran `git clone <repo link>` instead of the CLI command in step 1, you may run into errors when running `forge build` since it is looking for the dependencies for the project. `git submodule update --init --recursive` can be used if you clone the repo without installing the submodules.
@@ -353,8 +351,6 @@ These functions are called throughout the general setup and operation "flow" of 
 
 4. `isDebt()` returns a bool on whether or not the adaptor returns collateral or debt style position (this is for accounting).
 
-> 💡 _Hint:_ TODO:
-
 <details markdown='1'><summary>👩🏽‍🏫 Solution Code</summary>
 
 ```
@@ -395,17 +391,71 @@ These functions are called throughout the general setup and operation "flow" of 
 
 </details>
 
-#### **3.4.2 ERC4626Adaptor: `deposit()`, `withdraw()`,`withdrawableFrom()` Implementation**
+#### **3.4.2 ERC4626Adaptor: Helper Function `_verifyERC4626PositionIsUsed()` Implementation**
+
+The Sommelier protocol currently uses encoded `positionHash` variables as the key to a mapping `getPositionHashToPositionId` pointing to uint32 `positionIds`. This mapping is used in conjunction to `isPositionUsed()` within each Cellar. Each Cellar, upon setup of a new position, must ensure that the respective `adaptor` is trusted. This is done via having the Cellar call the functions necessary to add the adaptor to its `Catalogue`. 
+
+The ERC4626 adaptor will need to validate that the passed param `address erc4626Vault` is trusted by the respective calling Cellar. With the description of the above setup with the Cellar, positionHash, positionIds, etc. write the helper `_verifyERC4626PositionIsUsed()` within `ERC4626Adaptor.sol`.
+
+> 💡 _Hint:_ See other adaptor code, [within the Sommelier repo](https://github.com/PeggyJV/cellar-contracts/blob/dda39c99f5d448f96faafcdb00f3e24f9d385ea2/src/modules/adaptors/Balancer/BalancerPoolAdaptor.sol#L478), to understand how verification is done there for a respective Cellar position.
+
+<details markdown='1'><summary>👩🏽‍🏫 Solution Code</summary>
+
+```
+    /**
+     * @notice Reverts if a given `erc4626Vault` is not set up as a position in the calling Cellar.
+     * @dev This function is only used in a delegate call context, hence why address(this) is used
+     *      to get the calling Cellar.
+     */
+    function _verifyERC4626PositionIsUsed(address erc4626Vault) internal view {
+        // Check that erc4626Vault position is setup to be used in the calling cellar.
+        bytes32 positionHash = keccak256(abi.encode(identifier(), false, abi.encode(erc4626Vault)));
+        uint32 positionId = Cellar(address(this)).registry().getPositionHashToPositionId(positionHash);
+        if (!Cellar(address(this)).isPositionUsed(positionId))
+            revert ERC4626Adaptor__CellarPositionNotUsed(erc4626Vault);
+    }
+```
+
+</details>
+
+#### **3.5.1 AuraERC4626Adaptor: Helper Function `_validateAuraPool()` Implementation**
+
+The Sommelier protocol currently uses encoded `positionHash` variables as the key to a mapping `getPositionHashToPositionId` pointing to uint32 `positionIds`. This mapping is used in conjunction to `isPositionUsed()` within each Cellar. Each Cellar, upon setup of a new position, must ensure that the respective `adaptor` is trusted. This is done via having the Cellar call the functions necessary to add the adaptor to its `Catalogue`. 
+
+The Aura adaptor will need to validate that the passed param `address _auraPool` is trusted by the respective calling Cellar. With the description of the above setup with the Cellar, positionHash, positionIds, etc. write the helper `_validateAuraPool()` within `AuraERC4626Adaptor.sol`.
+
+> 💡 _Hint:_ 
+- Recall how `_verifyERC4626PositionIsUsed()` was written. This helper should follow the same suit except it is specific to AuraPools.
+- AuraPools are ERC4626
+
+<details markdown='1'><summary>👩🏽‍🏫 Solution Code</summary>
+
+```
+/**
+     * @notice Validates that a given auraPool is set up as a position in the calling Cellar.
+     * @dev This function uses `address(this)` as the address of the calling Cellar.
+     */
+    function _validateAuraPool(address _auraPool) internal view {
+        bytes32 positionHash = keccak256(abi.encode(identifier(), false, abi.encode(_auraPool)));
+        uint32 positionId = Cellar(address(this)).registry().getPositionHashToPositionId(positionHash);
+        if (!Cellar(address(this)).isPositionUsed(positionId))
+            revert AuraExtrasAdaptor__AuraPoolPositionsMustBeTracked(_auraPool);
+    }
+   
+```
+
+</details>
+
+#### **3.4.3 ERC4626Adaptor: `deposit()`, `withdraw()`,`withdrawableFrom()` Implementation**
 
 These functions are called throughout the general operation "flow" of a strategy. Details of each are as follows:
 
-1. `deposit()` - Cellar must approve ERC4626 position to spend its assets, then deposit into the ERC4626 position.
+`deposit()` - Cellar must approve ERC4626 position to spend its assets, then deposit into the ERC4626 position.
 
-2. `withdraw()` - Cellar needs to call withdraw on ERC4626 position.
-
-3. `withdrawableFrom()` - Cellar needs to call `maxWithdraw` to see if its assets are locked.
-
-> 💡 _Hint:_ TODO:
+> 💡 _Hints:_ 
+- Don't forget that Sommelier has permissions. Thus we need to verify that a position is actually used - this way we stop any malicious data to be passed in as a param via a malicious strategist.
+- Safe approvals are needed for a deposit from the cellar to the respective ERC4626 vault
+- Revoking of approvals is a good security measure because open-ended approvals open the cellar funds to risk.
 
 <details markdown='1'><summary>👩🏽‍🏫 Solution Code</summary>
 
@@ -427,7 +477,20 @@ These functions are called throughout the general operation "flow" of a strategy
         // Zero out approvals if necessary.
         _revokeExternalApproval(asset, address(erc4626Vault));
     }
+   
+```
 
+</details>
+
+`withdraw()` - Cellar needs to call withdraw on ERC4626 position.
+
+> 💡 _Hints:_ 
+- `isLiquid` is a `configurationData` boolean that allows whether a position is part of the unwrapping of a cellar position(s) when a user ends up trying to withdraw assets from a Sommelier cellar.
+- Don't forget to verify the position.
+
+<details markdown='1'><summary>👩🏽‍🏫 Solution Code</summary>
+
+```
     /**
      * @notice Cellar needs to call withdraw on ERC4626 position.
      * @dev Important to verify that external receivers are allowed if receiver is not Cellar address.
@@ -455,6 +518,19 @@ These functions are called throughout the general operation "flow" of a strategy
         erc4626Vault.withdraw(assets, receiver, address(this));
     }
 
+```
+
+</details>
+
+`withdrawableFrom()` - Cellar needs to call `maxWithdraw` to see if its assets are locked.
+
+> 💡 _Hints:_ 
+- `withdrawableFrom()` is used within the acocunting measures within the Sommelier protocol.
+- `isLiquid` is a `configurationData` boolean that is used within `withdrawableFrom()`. If it isn't liquid, then the position should return 0 as a return value when doing accounting measures within cellar operations.
+
+<details markdown='1'><summary>👩🏽‍🏫 Solution Code</summary>
+
+```
     /**
      * @notice Cellar needs to call `maxWithdraw` to see if its assets are locked.
      */
@@ -473,60 +549,7 @@ These functions are called throughout the general operation "flow" of a strategy
 
 </details>
 
-#### **3.4.3 ERC4626Adaptor: Helper Function `_verifyERC4626PositionIsUsed()` Implementation**
-
-The Sommelier protocol currently uses encoded `positionHash` variables as the key to a mapping `getPositionHashToPositionId` pointing to uint32 `positionIds`. This mapping is used in conjunction to `isPositionUsed()` within each Cellar. Each Cellar, upon setup of a new position, must ensure that the respective `adaptor` is trusted. This is done via having the Cellar call the functions necessary to add the adaptor to its `Catalogue`. 
-
-The ERC4626 adaptor will need to validate that the passed param `address erc4626Vault` is trusted by the respective calling Cellar. With the description of the above setup with the Cellar, positionHash, positionIds, etc. write the helper `_verifyERC4626PositionIsUsed()` within `ERC4626Adaptor.sol`.
-
-> 💡 _Hint:_ TODO:
-
-<details markdown='1'><summary>👩🏽‍🏫 Solution Code</summary>
-
-```
-    /**
-     * @notice Reverts if a given `erc4626Vault` is not set up as a position in the calling Cellar.
-     * @dev This function is only used in a delegate call context, hence why address(this) is used
-     *      to get the calling Cellar.
-     */
-    function _verifyERC4626PositionIsUsed(address erc4626Vault) internal view {
-        // Check that erc4626Vault position is setup to be used in the calling cellar.
-        bytes32 positionHash = keccak256(abi.encode(identifier(), false, abi.encode(erc4626Vault)));
-        uint32 positionId = Cellar(address(this)).registry().getPositionHashToPositionId(positionHash);
-        if (!Cellar(address(this)).isPositionUsed(positionId))
-            revert ERC4626Adaptor__CellarPositionNotUsed(erc4626Vault);
-    }
-```
-
-</details>
-
-#### **3.5.1 AuraERC4626Adaptor: Helper Function `_validateAuraPool()` Implementation**
-
-The Sommelier protocol currently uses encoded `positionHash` variables as the key to a mapping `getPositionHashToPositionId` pointing to uint32 `positionIds`. This mapping is used in conjunction to `isPositionUsed()` within each Cellar. Each Cellar, upon setup of a new position, must ensure that the respective `adaptor` is trusted. This is done via having the Cellar call the functions necessary to add the adaptor to its `Catalogue`. 
-
-The Aura adaptor will need to validate that the passed param `address _auraPool` is trusted by the respective calling Cellar. With the description of the above setup with the Cellar, positionHash, positionIds, etc. write the helper `_validateAuraPool()` within `AuraERC4626Adaptor.sol`.
-
-> 💡 _Hint:_ TODO:
-
-<details markdown='1'><summary>👩🏽‍🏫 Solution Code</summary>
-
-```
-/**
-     * @notice Validates that a given auraPool is set up as a position in the calling Cellar.
-     * @dev This function uses `address(this)` as the address of the calling Cellar.
-     */
-    function _validateAuraPool(address _auraPool) internal view {
-        bytes32 positionHash = keccak256(abi.encode(identifier(), false, abi.encode(_auraPool)));
-        uint32 positionId = Cellar(address(this)).registry().getPositionHashToPositionId(positionHash);
-        if (!Cellar(address(this)).isPositionUsed(positionId))
-            revert AuraExtrasAdaptor__AuraPoolPositionsMustBeTracked(_auraPool);
-    }
-   
-```
-
-</details>
-
-### 🥅 TODO **Goals / Checks**
+### 🥅 **Goals / Checks**
 
 - [ ] 👀👀 Time to check your general knowledge. You've written the basic core functions of a simple Sommelier adaptor. Can you outline what scenarios exist when Strategists call `callOnAdaptor()` with the following encoded function calls?
     1. `depositToVault()`
@@ -550,15 +573,15 @@ Now we'll check that your code actually works. Luckily we're leveraging the work
 
 So that means that focusing on running `forge test --match-contract <ContractName>` is all that is needed. Then running `forge test` will run the typical integrations tests needed to ensure a good working adaptor with the rest of the Sommelier architecture is sound! 
 
-Before running your tests you'll need to prepare your `.env` if you haven't already.
+> Before running your tests you'll need to prepare your `.env` if you haven't already. Create your `.env` in the same directory as the `.env.example`
 
 > Prepare a `.env` file by copying the `.env.example` file from this repo && populate the necessary environment variables. **Make sure that `.env` is listed in your `.gitignore`!!! It should be by default if you cloned this repo but always make sure.**
 
 Here's some notes on the environment variables you'll need to get:
 
-1. `ETH_RPC_URL`: To deploy the code onto a persistent mainnet fork, you'll need the RPC URL, you can get one from infura or alchemy:
+1. `MAINNET_RPC_URL`: To deploy the code onto a persistent mainnet fork, you'll need the RPC URL, you can get one from infura or alchemy:
 
-- `MAINNET_RPC = <insert ETH RPC URL here>`
+- `MAINNET_RPC_URL = <insert ETH RPC URL here>`
 
 2. `ETHERSCAN_API_KEY`: Etherscan is the leading block explorer, search, API, and analytics platform for Ethereum. Data from the blockchain can be queried using their avaiable APIs. Head to etherscan.io and set up your account to get your own API keys if you haven't done so already.
 
@@ -566,22 +589,24 @@ Here's some notes on the environment variables you'll need to get:
 
 > Make sure you are using latest version of foundry, so that it auto-sources `.env`, otherwise run (while in the root directory): `source .env`
 
-Now test your strategy and run `forge test --match-contract <ContractName>`
+Now test your strategy and run `forge test --match-contract <ContractName>` --> so in this case the command would be: `forge test --match-contract AuraERC4626AdaptorTest`
 
 > At this point you should see that there are some errors actually. Using foundry, you can go through the terminal outputs to find out what went wrong with the code.
 
 > There should be two errors that prompt up, and one more as we go along, you'll see 😉
 
 ---
-TODO: this is where you left off Steve --> need to actually troubleshoot this challenge and see if it works.
-
 ### ⛳️ **Checkpoint 9: Troubleshooting Test Errors** 👨🏼‍🔬
 
-The errors that should have arose at this point are due to the basic integrations tests that Sommelier has written up. You can find them in the following directory path: TODO:
+If you had any errors or reversions come up, then you'll get into what every developer has to learn at some point. Debugging. Some quick tips:
+
+1. Run the specific failing tests with `console.logs` on key variables, increase verbosity for testing by adding `-vvvv` (you can reduce verbosity of course by lessening the number of `v`'s in the CLI command).
+2. Run specific tests instead of running all tests by using commands like: `forge test --match-contract AuraERC4626AdaptorTest --match-test testInterestAccrual -vvvv`
+3. Ask forge specific questions on the [Foundry telegram](https://t.me/foundry_support). 
 
 > 😮‍💨🫠 Whew, at this point it should be passing the basic Sommelier tests. Further diligence in writing more robust tests is needed followed by detailed peer reviews and audits if you want to see your adaptor go to production in Sommelier's testing grounds.
 
-###
+### 🎉✅ CONGRATS
 
 **🎉🍾 Congratulations!!! You just finished writing your first simple Sommelier adaptor!!!**
 
