@@ -16,7 +16,6 @@ import {AuraERC4626Adaptor} from "contracts/solutions/AuraERC4626Adaptor.sol";
  * @dev NOTE: This was taken from the Peggy JV Github (Sommelier Cellar-Contracts Github Repo)
  * @dev Mock datafeeds to be used for underlying BPTs. For tests, we'll go with rETH / wETH BPT pair. We'll use mock datafeeds for the constituent assets of this pair so we can warp forward to simulate reward accrual.
  * NOTE: transferrance of aura-wrapped BPT is not alowed as per their contracts
- * TODO: setup imports and copy over from Peggy JV Repo to get tests working. Might have to pull the PeggyJV repo in as a submodule and fix the imports to reflect the submodule. Then just have the AWS instance run forge test on this specific test contract (and ofc have the test contract names reflected in the imports instead of the submodule).
  */
 contract AuraERC4626AdaptorTest is MainnetStarterTest, AdaptorHelperFunctions {
     using SafeTransferLib for ERC20;
