@@ -14,7 +14,7 @@ This challenge is focused on guiding students through the following:
 
 > THIS CHALLENGE AND THE CODE INVOLVED IS NOT TO BE USED FOR PRODUCTION CODE. IT IS FOR EDUCATIONAL PURPOSES ONLY.
 
-> TODO: 💬 Meet other builders in the [DeFi Challenge 2 Telegram!](insert LINK HERE). This group chat also acts as a hub for chatting all things Sommelier development. It does not replace Sommelier's discord and other comms channels.
+> 💬 Meet other builders in the [DeFi Challenge 2 Telegram!](https://t.me/+WTeDEHIo13xhZTcx). This group chat also acts as a hub for chatting all things Sommelier development. It does not replace Sommelier's discord and other comms channels.
 
 💡✨ This serves as the first of possibly many ERC4626 Adaptor Challenges / Tutorials focused on the creation and usage of "APIs" for different external projects. If you are interested in writing new Challenges / Tutorials, please reach out to @steve0xp && @austingriffith. 
 
@@ -149,7 +149,15 @@ This adaptor allows ERC4626 vaults to integrate with other general ERC4626 vault
 
 > 😱 If Sommelier and other protocols did not take precautions such as only approving certain positions within ERC4626 Vaults && for their Strategists to engage with, malicious vault positions could take root. Ex.) We could have a vault interact with a random unverified smart contract that actually has a `RugVault()` function on it. 😱
 
-To get the most of this tutorial, you need to really read the docs of the protocol that you are integrating into, Aura in this case, and find the external function calls to make from your own smart contract. It is key to look at actual transactions on "in-prod" deployments. So in this case, check out an actual AuraPool BPT tx that carries out mutative state changes resulting in deposited or redeemed assets. Luckily, when it comes to interacting with the AuraPools, the AuraPools on Mainnet adhere to the ERC4626 standard. Therefore, we can treat AuraPools just like any other ERC4626 vault except for other aspects that may be special for AuraPools (such as claiming rewards). When you go through this, you'll find that, in terms of generic ERC4626 functionality, this contract allows one to `depositToVault()` and `withdrawFromVault()`. TODO:  find etherscan txs to help students.
+To get the most of this tutorial, you need to really read the docs of the protocol that you are integrating into, Aura in this case, and find the external function calls to make from your own smart contract. It is key to look at actual transactions on "in-prod" deployments. So in this case, check out an actual AuraPool BPT tx that carries out mutative state changes resulting in deposited or redeemed assets. Luckily, when it comes to interacting with the AuraPools, the AuraPools on Mainnet adhere to the ERC4626 standard. Therefore, we can treat AuraPools just like any other ERC4626 vault except for other aspects that may be special for AuraPools (such as claiming rewards). When you go through this, you'll find that, in terms of generic ERC4626 functionality, this contract allows one to `depositToVault()` and `withdrawFromVault()`.
+
+**Example:**
+
+- Start looking at one of the Aura pools in the test file (rETH_wETH_BPT) -> https://app.aura.finance/#/1/pool/109
+
+- From there, clicked "advanced mode" and click around! You should end up finding a contract like this: https://etherscan.io/address/0xdd1fe5ad401d4777ce89959b7fa587e569bf125d#code
+
+- Poke around in the above contract. You can do so by using etherscan.deth.net! All you have to do is replace the external address of the code that you want to look at and you can view it in a code editor format using deth.net! https://etherscan.deth.net/address/0xdd1fe5ad401d4777ce89959b7fa587e569bf125d
 
 With the knowledge you've picked up from reading the references mentioned for ERC4626, write the `depositToVault()` and `withdrawFromVault()` functions with the perspective of this contract being used by a _calling Vault_ to a _callee Vault_.
 

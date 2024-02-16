@@ -7,7 +7,7 @@ pragma solidity 0.8.21;
  * @author crispymangoes, 0xEinCodes. Edited / Brought in to be a tutorial challenge by steve0xp
  * @notice An interface outlining the concepts and some functions needed for current-day ERC4626s to integrate into protocols using protocol-bespoke functions. For the challenge, simply read over the comments here to understand how we will break the challenge up.
  * @dev The intent is to showcase an example contract on integrating btw ERC4626s and external protocols. This is done in a series of steps. This also shows how standards like ERC4626 push open-source collaboration, and continuously rely on it. The adaptors that Sommelier creates can be simplified to offer ERC4626 agnostic adaptors, where minimal extra auditing is needed. These effectively act as APIs for respective protocols and other ERC4626 projects.
- * @dev Example of implementation used in Sommelier protocol found here: TODO: insert link for Aura devlopments. 
+ * @dev Example of implementation used in Sommelier protocol found here: https://github.com/PeggyJV/cellar-contracts/pull/141
  * NOTE: A full yield aggregator protocol or any others using ERC 4626 vaults will likely need to keep track of pricing of BPTs wrt a base asset. This aspect is left up to the respective protocol to design and implement. Pricing examples using the Sommelier protocol pricing architecture are outlined to illustrate pricing the various types of BPTs.
  * NOTE: This adaptor and pricing derivatives focus on stablepool BPTs
  */
