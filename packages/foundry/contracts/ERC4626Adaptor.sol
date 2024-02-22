@@ -10,7 +10,6 @@ import { ERC4626 } from "@solmate/mixins/ERC4626.sol";
  * @notice A challenge outlining the concepts and some functions needed for current-day ERC4626s to integrate into protocols using protocol-bespoke functions. 
  * @dev The intent is to showcase how standards like ERC4626 push open-source collaboration, and continuously rely on it. The adaptors that Sommelier creates can be simplified to offer ERC4626 agnostic adaptors, where minimal extra auditing is needed. These effectively act as APIs for respective protocols and other ERC4626 projects.
  * @dev This Challenge showcases the steps for creating an adaptor. 
- * @dev Example of implementation used in Sommelier protocol found here: TODO: insert link for Aura developments. 
  * NOTE: A full yield aggregator protocol or any others using ERC 4626 vaults will likely need to keep track of pricing of BPTs wrt a base asset. This aspect is left up to the respective protocol to design and implement. Pricing examples using the Sommelier protocol pricing architecture are outlined to illustrate pricing the various types of BPTs.
  * NOTE: This adaptor and pricing derivatives focus on stablepool BPTs
  */

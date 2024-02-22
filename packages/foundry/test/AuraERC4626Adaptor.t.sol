@@ -7,7 +7,7 @@ import "@cellar-contracts/test/resources/MainnetStarter.t.sol";
 import {AdaptorHelperFunctions} from "@cellar-contracts/test/resources/AdaptorHelperFunctions.sol";
 import {IVault, IERC20} from "@balancer/interfaces/contracts/vault/IVault.sol";
 import {BalancerStablePoolExtension} from "@cellar-contracts/src/modules/price-router/Extensions/Balancer/BalancerStablePoolExtension.sol";
-import {AuraERC4626Adaptor} from "contracts/solutions/AuraERC4626Adaptor.sol";
+import {AuraERC4626Adaptor} from "contracts/AuraERC4626Adaptor.sol";
 
 /**
  * @title AuraERC4626AdaptorTest
